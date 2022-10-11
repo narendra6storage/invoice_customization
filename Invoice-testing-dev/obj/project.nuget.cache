@@ -1,0 +1,10 @@
+{
+  "version": 2,
+  "dgSpecHash": "/dU7uvXnlmdszHsf60KNn97d4eybWdIxtUlqLhChzwab7wKf7lOpWJk2DOKLNU7Wg0Wd4B0FxuxYWY97ULPRxw==",
+  "success": true,
+  "projectFilePath": "C:\\Prasanna\\Prasan Projects\\Invoice-testing-dev\\Invoice-testing-dev\\Invoice-testing-dev.csproj",
+  "expectedPackageFiles": [
+    "C:\\Users\\User\\.nuget\\packages\\newtonsoft.json\\13.0.1\\newtonsoft.json.13.0.1.nupkg.sha512"
+  ],
+  "logs": []
+}

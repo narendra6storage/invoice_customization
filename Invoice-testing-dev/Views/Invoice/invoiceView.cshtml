@@ -1,0 +1,796 @@
+﻿@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@using SixStorage.AutoInvoice.WebApi.Shared.DTOs.AutoInvoice
+@model InvoicePdfDto
+@{
+}
+
+
+@functions{
+
+    private Guid loginClientId = Guid.Empty;
+    private IConfiguration configuration;
+
+    public List<LanguageCustomization> GetCustomizedTextInfo(string pageName, Guid? ClientId = null)
+    {
+        var lstTranslationInfo = new List<LanguageCustomization>();
+        string _connectionString = configuration.GetConnectionString("6StorageAPI");
+        try
+        {
+            if (loginClientId == Guid.Empty && (ClientId ?? Guid.Empty) != Guid.Empty)
+            {
+                loginClientId = (Guid)ClientId;
+            }
+            if (!string.IsNullOrEmpty(pageName) && loginClientId != Guid.Empty)
+            {
+
+            }
+        }
+        catch (Exception ex)
+        {
+            
+        }
+            return lstTranslationInfo;
+        }
+}
+
+<div id="dvInvoicePdf" style="padding:10px;">
+
+
+    <style>
+        div, table {
+            font-family: Arial;
+        }
+
+            table thead tr th, table tbody tr td {
+                padding: 3px 5px 0px 5px;
+                /*border: 1px solid #ddd; */
+            }
+
+        #Invoice tbody tr td {
+            padding: 8px;
+            /*border: 1px solid #ddd;*/
+            text-align: center;
+        }
+
+        table {
+            width: 100%;
+        }
+
+        .row {
+            /*width: 100%;*/
+            clear: both;
+            margin-bottom: 20px;
+        }
+
+        .col-md-4 {
+            width: 33%;
+            float: left;
+        }
+
+        .graybox {
+            background-color: #ddd !important;
+            padding: 5px !important;
+            /*border: 1px solid #666 !important;*/
+            border-radius: 5px;
+        }
+
+        fieldset {
+            border: none;
+        }
+
+            fieldset legend {
+                border: none;
+                font-weight: bold;
+                font-size: 16px;
+                margin-bottom: 50px !important;
+            }
+
+        .alignCenter {
+            text-align: center !important;
+        }
+
+        .alignRight {
+            text-align: right !important;
+        }
+
+        body {
+            counter-reset: Serial; /* Set the Serial counter to 0 */
+        }
+
+        tr td.alignCenter:first-child:before {
+            counter-increment: Serial; /* Increment the Serial counter */
+            content: counter(Serial); /* Display the counter */
+        }
+
+
+        .alignCenter {
+            text-align: center !important;
+        }
+
+        .alignRight {
+            text-align: right !important;
+        }
+
+        .btn-u {
+            border: 0;
+            color: #fff;
+            font-size: 14px;
+            cursor: pointer;
+            font-weight: 400;
+            padding: 6px 13px;
+            position: relative;
+            background: #72c02c;
+            white-space: nowrap;
+            display: inline-block;
+            text-decoration: none;
+        }
+
+        table tbody tr td span {
+            font-size: 13px !important;
+            /*line-height: 1.5;*/
+        }
+
+        table tbody tr td {
+            font-size: 15px !important;
+        }
+
+        table tbody tr th {
+            font-size: 14px !important;
+            text-align: center !important;
+            font-weight: bold
+        }
+
+            table tbody tr th .downtxt {
+                display: block;
+                padding-top: 5px;
+                font-size: 11px !important
+            }
+
+        #dvInvoicePdf {
+            max-width: 1000px;
+            margin-left: auto;
+            margin-right: auto;
+            display: block;
+        }
+
+        #invoice-tablegrid tbody tr td {
+            font-size: 13px !important;
+        }
+
+        .gridspan4 tbody tr td {
+            font-size: 15px !important;
+            padding-left: 0px;
+        }
+
+        .gridspan4 tbody tr th {
+            font-size: 16px !important;
+        }
+
+        .gridspan4 tbody tr td span {
+            font-size: 15px !important;
+        }
+
+        #ftr-txt td span {
+            font-size: 13px !important;
+        }
+
+        .gridspan5 tbody tr td {
+            font-size: 13px !important;
+        }
+
+        .acgridspan4 tbody tr td {
+            padding: 0px;
+        }
+
+        #remove-brk br {
+            display: none !important;
+        }
+
+        #printbtn {
+            float: right;
+            color: #fff;
+            background-color: #5cb85c;
+            border-color: #4cae4c;
+        }
+
+        #btnPDFExportReportSearch {
+            float: right;
+            margin-right: 15px;
+        }
+
+        table {
+            letter-spacing: 0.5px !important;
+        }
+
+        td#imgtd {
+            padding: 0px !important;
+            display: block;
+        }
+
+        @@media print {
+            img#imglogo {
+                width: 50% !important;
+                height: 50% !important;
+            }
+
+            th#BankdetailsTd {
+                white-space: nowrap;
+            }
+
+            table.gridspan4 {
+                width: 100%;
+            }
+
+            table.acgridspan4 {
+                width: 100%;
+            }
+
+            td#ibanTd {
+                white-space: nowrap;
+            }
+
+            th#remitpayTh {
+                white-space: nowrap;
+            }
+
+            td.removewhite {
+                white-space: nowrap;
+            }
+
+            html, body {
+                height: auto;
+                display: block;
+            }
+
+            tr#remitTr {
+                margin-left: 50px;
+                display: block;
+            }
+
+            tr#paymentTr {
+                margin-left: 52px;
+                display: block;
+            }
+
+            tr#remitTd {
+                width: 44% !important;
+            }
+        }
+
+        /*tr {
+                page-break-inside: avoid !important;
+            }*/
+        thead {
+            display: table-header-group;
+        }
+
+        tfoot {
+            display: table-row-group;
+        }
+
+        tr {
+            page-break-inside: avoid;
+        }
+
+        .salesInvdetailsRight-td {
+            width: 125px;
+            max-width: 125px;
+            word-break: break-all;
+        }
+    </style>
+
+
+
+
+
+    <div>
+        <table style="margin-left:auto;margin-right:auto;">
+            <tbody>
+                <tr>
+                    <td style="width:10px;">
+                        <table>
+                            <tbody>
+                                <tr>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <span style="text-align:left;font-weight:bold;text-decoration:underline"><b>Facility Address :</b></span>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <span>@Model.ClientDetails.CompanyName<br> </span>
+
+                                        <span>@Model.ClientDetails.AddressLine1</span>
+
+                                        <br>
+                                        <span>
+                                            @Model.ClientDetails.AddressLine2
+                                            <br>
+                                        </span>
+                                        <span>@Model.ClientDetails.City</span>
+                                        <span>@Model.ClientDetails.State</span>
+
+                                        <span>@Model.ClientDetails.Zipcode</span>
+                                        <br>
+                                        <span>@Model.ClientDetails.Country</span>
+                                    </td>
+                                </tr>
+                                <tr>
+
+
+                                    <td style="padding-top:10px;">
+                                        <span>@Model.ClientDetails.MobileNumber</span><br>
+
+                                        <span>@Model.ClientDetails.EmailAddress</span><br>
+
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </td>
+
+                    <td style="text-align:right;padding-top:4px !important;display:block;" valign="top" id="imgtd">
+
+
+
+                        <img src="https://s3-us-west-2.amazonaws.com/storageadminlivedocs/logo1.jpg" style="width:250px;height:auto;" id="imglogo" alt="6Storage.Com">
+
+                    </td>
+                </tr>
+
+                <tr>
+                    <td style="position:relative;top:-15px;height:35px;">
+                        <span style="font-size:11px;font-family:arial;font-weight:normal;">
+                        </span>
+                    </td>
+                </tr>
+
+                <tr>
+
+
+                    <td style="padding-left:10px; padding-top:0px;vertical-align:top;">
+                        <table style="max-width:385px;">
+                            <tbody>
+
+
+                                <tr>
+                                    <td>
+                                        <span style="text-align:left;font-weight:bold;text-decoration:underline"><b>Invoice To :</b></span>
+                                    </td>
+                                </tr>
+                                <tr>
+
+                                    <td style="width:105px;">
+                                        <span style="font-size:11px;font-family:arial;font-weight:normal;">
+                                            <span>@Model.CustomerDetails.FirstName @Model.CustomerDetails.LastName<br></span>
+                                            @Model.CustomerDetails.AddressLine1<br>
+                                            @Model.CustomerDetails.AddressLine2<br>
+                                            @Model.CustomerDetails.City                                                        <span></span>
+                                            @Model.CustomerDetails.State<span></span>
+                                            @Model.CustomerDetails.Zipcode<br>
+                                            @Model.CustomerDetails.Country
+                                        </span>
+
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td style="padding-top:10px;">
+                                        <table>
+                                            <tbody>
+                                                <tr>
+                                                    <td style="padding:0px;">
+                                                        <span>@Model.CustomerDetails.MobileNumber<br></span>
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td style="padding:0px;">
+                                                        <span>@Model.CustomerDetails.EmailAddress<br></span>
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td style="padding:0px;">
+                                                        <span>Tax ID101: </span>  <span>@Model.CustomerDetails.TaxNumber</span>
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </td>
+                                </tr>
+
+
+
+
+
+                            </tbody>
+                        </table>
+                    </td>
+
+                    <td style="padding-top: 0px; vertical-align: top;">
+
+
+                        <table align="right" style="line-height:1.4 !important">
+                            <tbody>
+
+
+                                <tr>
+                                    <td style="text-align:right;">
+                                        <span style="font-size:11px;font-family:arial;font-weight:bold;">Date</span>
+                                    </td>
+                                    <td class="salesInvdetailsRight-td">
+                                        <span style="font-size:11px;font-family:arial;font-weight:normal;">@Model.CurrentDateStr</span>
+                                    </td>
+                                </tr>
+
+
+                                <tr>
+                                    <td style="text-align:right;">
+                                        <span style="font-size:11px;font-family:arial;font-weight:bold;">Invoice Number</span>
+                                    </td>
+                                    <td class="salesInvdetailsRight-td">
+                                        <span style="font-size:11px;font-family:arial;font-weight:normal;">@Model.InvoiceNumber</span>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td style="text-align:right;">
+                                        <span style="font-size:11px;font-family:arial;font-weight:bold;">Page</span>
+                                    </td>
+                                    <td>
+                                        <span style="font-size:11px;font-family:arial;font-weight:normal;">1 - 1</span>
+                                    </td>
+                                </tr>
+
+                                <tr>
+                                    <td style="text-align:right;">
+                                        <span style="font-size:11px;font-family:arial;font-weight:bold;">Billing Period</span>
+                                    </td>
+                                    <td class="salesInvdetailsRight-td">
+                                        <span style="font-size:11px;font-family:arial;font-weight:normal;">@Model.BillingPeriodFromStr</span>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td style="text-align:right;padding-top:0px;">
+                                        <span style="font-size:11px;font-family:Arial;font-weight:bold;">to</span>
+                                    </td>
+                                    <td style="padding-top:0px;" class="salesInvdetailsRight-td">
+                                        <span style="font-size:11px;font-family:Arial;font-weight:normal;">@Model.BillingPeriodToStr</span>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td style="text-align:right;">
+                                        <span style="font-size:11px;font-family:arial;font-weight:bold;">Scheduled move out date</span>
+                                    </td>
+                                    <td class="salesInvdetailsRight-td">
+                                        <span style="font-size:11px;font-family:arial;font-weight:normal;">@Model.ScheduledMoveOutStr</span>
+                                    </td>
+                                </tr>
+
+                                <tr>
+                                    <td style="text-align:right;">
+                                        <span style="font-size:11px;font-family:arial;font-weight:bold;">Billing Cycle</span>
+                                    </td>
+                                    <td class="salesInvdetailsRight-td">
+                                        <span style="font-size:11px;font-family:arial;font-weight:normal;">@Model.BillingCycle</span>
+                                    </td>
+                                </tr>
+
+                            </tbody>
+                        </table>
+                    </td>
+                </tr>
+
+                <tr>
+                    <td colspan="3" style="padding-top:20px; text-align: center;">
+                        <span style="font-size:25px!important;font-family:arial;">Sales Invoice</span>
+                    </td>
+                </tr>
+                @if (Model.PastDueList.Count != 0)
+                {
+                    <tr style="page-break-before:avoid;">
+                        <td colspan="2">
+                            <span id="spnPastDueText" style="font-size:20px!important;"> Past Due</span>
+                            <table style="page-break-before:avoid;">
+                                <tbody>
+                                    <tr style="background: #eee;page-break-before:avoid;">
+
+                                        <th style="text-align:center;padding-top:1px;padding-bottom:1px;">
+                                            Unit number
+                                        </th>
+                                        <th style="text-align:center;padding-top:1px;padding-bottom:1px;">
+                                            Invoice Period
+                                        </th>
+                                        <th style="text-align:center;padding-top:1px;padding-bottom:1px;">
+                                            Balance
+                                        </th>
+                                        <th style="text-align:center;padding-top:1px;padding-bottom:1px;">
+                                            Late fee
+                                        </th>
+                                        <th style="text-align:right !important;padding-top:1px;padding-bottom:1px;padding-right:15px;">
+                                            Total
+                                        </th>
+                                    </tr>
+                                        @foreach (PastDueDetails pastDueItem in Model.PastDueList)
+                                        {
+                                            <tr style="page-break-before:avoid;">
+                                                <td style="text-align:center;padding-top:1px;padding-bottom:1px;">
+                                                    @pastDueItem.UnitNumber
+                                                </td>
+                                                <td style="text-align:center;padding-top:1px;padding-bottom:1px;">
+                                                    @pastDueItem.BillingPeriodStr
+                                                </td>
+                                                <td style="text-align:center;padding-top:1px;padding-bottom:1px;">
+                                                    @CurrencyHelper.GetStringValue(pastDueItem.Balance)
+                                                </td>
+                                                <td style="text-align:center;padding-top:1px;padding-bottom:1px;">
+                                                    @CurrencyHelper.GetStringValue(pastDueItem.LateFee)
+                                                </td>
+                                                <td style="text-align:right;padding-top:1px;padding-bottom:1px;">
+                                                    @CurrencyHelper.GetStringValue(pastDueItem.TotalDue)
+                                                </td>
+                                            </tr>
+                                        }
+                                </tbody>
+                            </table>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td colspan="2">
+                            <table style="margin-top:15px;">
+                                <tbody>
+                                    <tr style=" border: 1px solid #ddd;">
+                                        <td style="visibility:hidden;width:30%;"></td>
+                                        <td style="visibility:hidden;width:35%;"></td>
+                                        <td colspan="2" style="text-align: center; font-weight: bold; padding-top: 9px; border-left: 1px solid #ddd; border-right: 1px solid white !important; padding-bottom: 9px;">
+                                            Past Due Balance
+                                        </td>
+                                        <td colspan="3" style="text-align: right; padding-top: 9px; padding-bottom: 9px; border-right: 1px solid #ddd;">
+                                            @CurrencyHelper.GetStringValue(Model.PastDueBlanceTotal)
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </td>
+                    </tr>
+                }
+
+                <tr>
+                    <td colspan="2" style="width:100%;border:1px solid #ddd;padding:0;" cellspacing="10">
+                        <table class="gridspan5" width="100%" style="width:100%;border:0;border-collapse:collapse;line-height:1.5;">
+                            <thead>
+                                <tr style="font-size:11px;font-family:arial;border-bottom:1px solid #ddd;font-weight:bold;background:#eee;line-height:1;">
+                                    <th style="text-align:left !important; padding-top: 9px; padding-bottom: 9px; padding-left: 5px;width:25%;">
+                                        Item
+                                    </th>
+                                    <th style="text-align:right !important;padding-top:1px;padding-bottom:1px;width:30%;;">
+                                        Quantity
+                                    </th>
+                                    <th style="text-align:right !important;padding-top:1px;padding-bottom:1px;padding-right:6px;">
+                                        Gross Cost
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (InvoiceItemDetails invoiceItem in Model.InvoiceItemList)
+                                {
+                                    <tr style="text-align:center; padding-top: 9px; padding-bottom: 9px; padding-left: 5px;">
+                                        <td style="text-align:left;padding-top:1px;padding-bottom:1px;">
+                                            @invoiceItem.ItemDescription
+                                        </td>
+                                        <td style="text-align:right;;padding-top:1px;padding-bottom:1px;">
+                                            @invoiceItem.Quantity
+                                        </td>
+                                        <td style="text-align:right;padding-top:1px;padding-bottom:1px;padding-right:6px;">
+                                            @CurrencyHelper.GetStringValue(invoiceItem.GrossCost)
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+        <table>
+            <tbody>
+                <tr>
+                    <td colspan="5" align="center" style="font-size:12px!important;font-weight:normal;font-family:arial;">
+                        Please note terms &amp; conditions apply
+                    </td>
+                </tr>
+
+                <tr>
+                    <td colspan="2" style="width:100%;"></td>
+                    <td colspan="6">
+                        <table align="right" style=";border:1px solid #ddd;">
+                            <tbody>
+                                <tr>
+                                    <td style="font-size:10px;font-family:arial;font-weight:bold;padding-right:80px;padding-top:8px;white-space:nowrap;padding-bottom:8px;">
+                                        Sub Total
+                                    </td>
+                                    <td style="font-size:10px;font-family:arial;font-weight:bold;text-align:right;white-space:nowrap;">
+                                        @CurrencyHelper.GetStringValue(Model.InvoiceSubTotal)
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="2" style="width:100%;"></td>
+                    <td colspan="6">
+                        <table align="right" style=";border:1px solid #ddd;">
+                            <tbody>
+                                <tr>
+                                    <td style="font-size:10px;font-family:arial;font-weight:bold;padding-right:80px;padding-top:8px;white-space:nowrap;padding-bottom:8px;">
+                                        Total Tax
+                                    </td>
+                                    <td style="font-size:10px;font-family:arial;font-weight:bold;text-align:right;white-space:nowrap;">
+                                        @CurrencyHelper.GetStringValue(Model.InvoiceTaxTotal)
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="2" style="width:100%;"></td>
+                    <td colspan="6">
+                        <table align="right" style=";border:1px solid #ddd;">
+                            <tbody>
+                                <tr>
+                                    <td style="font-size:10px;font-family:arial;font-weight:bold;padding-right:80px;padding-top:8px;white-space:nowrap;padding-bottom:8px;">
+                                        Current Due
+                                    </td>
+                                    <td style="font-size:10px;font-family:arial;font-weight:bold;text-align:right;white-space:nowrap;">
+                                        @CurrencyHelper.GetStringValue(Model.InvoiceCurrentDue)
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </td>
+                </tr>
+
+                <tr>
+                    <td colspan="2" style="width:100%;"></td>
+                    <td colspan="6">
+                        <table align="right" style="border:1px solid #ddd;margin-top:8px;">
+                            <tbody>
+                                <tr>
+                                    <td style="font-size:10px;font-family:arial;font-weight:bold;padding-right:80px;padding-top:8px;white-space:nowrap;padding-bottom:8px;">
+                                        Payment Due on
+                                    </td>
+                                    <td style="font-size:10px;font-family:arial;font-weight:normal;text-align:right;font-weight:bold;white-space:nowrap;">
+                                        @Model.PaymentDueDateStr
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </td>
+                </tr>
+
+
+            </tbody>
+        </table>
+
+        <table id="tblPastDueTable" style="width: 100%;border: 1px solid #ddd !important; margin-bottom: 10px;border-collapse: collapse; page-break-inside: auto;" border="0">
+        </table>
+
+        <table align="right" style="width:100%;margin-right:0px;">
+            <tbody>
+                <tr style="border:1px solid #ddd;">
+                    <td style="visibility: hidden; width: 30%;"></td>
+                    <td style="visibility: hidden; width: 35%;"></td>
+                    <td style="font-size:10px;font-family:arial;border:1px solid #ddd;border-right:1px solid #fff; font-weight:bold;text-align:left; padding-right:15px;padding-top:8px;white-space:nowrap;padding-bottom:9px;">
+                        Total amount Due
+                    </td>
+                    <td style="font-size:10px;font-family:arial;font-weight:bold;text-align:right;white-space:nowrap;border:1px solid #ddd;border-left:1px solid #fff;width: 15%;">
+                        @CurrencyHelper.GetStringValue(Model.InvoiceTotalDue)
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+
+
+
+
+    &nbsp;
+
+
+
+
+
+
+    @{
+        <table style="width:100%" id="leasegridspan">
+            <tbody>
+                <tr style="display:block;" id="remitTr">
+                    <td style="vertical-align:top; padding-bottom:20px;" id="remitTd">
+                        <table class="gridspan4">
+                            <tbody>
+                                <tr>
+                                    <th style="text-decoration:underline;text-align:left !important;font-family:arial;font-size:9px;font-weight:bold;" id="remitpayTh">
+
+                                        Remit Payment to
+                                    </th>
+                                </tr>
+                                <tr>
+                                    <td style="font-size:9px;font-family:arial;font-weight:normal;padding-bottom:0px;" class="removewhite">
+                                        <span>@Model.RemitPaymentTo.CompanyName<br> </span>
+                                        <span>@Model.RemitPaymentTo.AddressLine1<br> </span>
+                                        <span>@Model.RemitPaymentTo.AddressLine2<br> </span>
+                                        <span>@Model.RemitPaymentTo.City<br> </span>
+                                        <span>@Model.RemitPaymentTo.State<br> </span>
+                                        <span>@Model.RemitPaymentTo.Country<br> </span>
+                                        <span>@Model.RemitPaymentTo.Zipcode<br> </span>
+                                        <span>@Model.RemitPaymentTo.MobileNumber</span>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </td>
+
+
+
+                    <td style="vertical-align:top; padding-left:50px; display:none;">
+                        <table class="gridspan4 acgridspan4">
+                            <tbody>
+                                <tr>
+                                </tr>
+                                <tr>
+                                </tr>
+                                <tr>
+                                </tr>
+
+
+                            </tbody>
+                        </table>
+                    </td>
+                </tr>
+
+                <tr>
+                    <td>
+                        Footer Note
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    }
+
+    <div style="text-align:center;margin-top:50px;">
+        <a target="_blank" rel="noreferrer" href="https://secureclient.8storage.com/login/10b074c6-cf0e-4704-9eee-013d1e1dd98c" style="font-size:16px;font-weight:700;text-decoration:underline;">Click here to pay</a>
+    </div>
+
+    <div style="text-align:center;margin-top:50px;">
+        <img id="barcode" class="barcode" src="data:image/png;base64,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">                <div><span>Viitenumero 2018 INVOICE11/07/2022367INOVITEN000001 000045 </span> </div>
+
+
+    </div>
+
+    <div id="footer" style="display:none">
+        <table>
+            <tbody>
+                <tr style="border:1px solid #ddd;" id="ftr-txt">
+                    <td colspan="6" style="border:1px solid #ddd;text-align:center;font-family:arial;font-size:8px;">
+                        <span id="remove-brk" style="width:100%;display:inline-block">
+                            footer text 1
+                        </span><br>
+                        <span style="width:100%;display:inline-block">
+                            footer text 2
+                        </span>
+                    </td>
+                </tr>
+                <tr hidden="">
+
+                    <td colspan="5" class="alignRight">
+
+
+                        <input type="button" id="btnPDFExportReportSearch" value="Export PDF" class="btn  btn-success" style="display:none" tabindex="9" onclick="ExportInvoiceHtmlToPDF()">
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
