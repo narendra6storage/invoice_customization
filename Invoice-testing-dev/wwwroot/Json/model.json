@@ -1,10 +1,10 @@
 {
   "DateFormat": "MM/dd/yyyy",
-  "CurrentDateStr": "08/04/2022",
+  "CurrentDateStr": "08/04/2InvoiceIdGuid022",
   "IsMergedInvoice": false,
   "InvoiceIdGuid": "4e64e416-3de3-4ac8-b48a-65b70adfd84f",
   "InvoiceIdNum": 29,
-  "InvoiceNumber": "29",
+  "InvoiceNumber": "29", //TODO WHY THESE 2 FIELDS
   "UnitIdGuid": "e913d0bb-df16-44b9-b3de-bc54a729ee23",
   "UnitNumber": "A2B",
   "InvoiceCategory": "Sales Invoice",
@@ -12,6 +12,7 @@
   "ClientLogoPath": "https://s3-us-west-2.amazonaws.com/storageadminlivedocs/logo1.jpg",
   "InvoiceDate": "2022-08-04T00:00:00",
   "InvoiceDateStr": "08/04/2022",
+  "Paymenttype": "Cash",
   "BillingCycle": "1",
   "BillingCycleType": "Monthly",
   "BillingPeriodFrom": "2022-08-01T23:59:59",
@@ -27,8 +28,12 @@
   "InvoiceTaxTotal": 0.0,
   "InvoiceCurrentDue": 100.00,
   "InvoiceTotalDue": 200.00,
+  "lateFeeAmount": 0, //TODO newly added
+  "Insurance": 0, // TODO newly added
+  "TotalInvAmt": 0, //TODO newly added for Model.InvoiceBalance + Model.lateFeeAmount;
   "FooterText1": "",
   "FooterText2": "",
+  "TenantId": "123456",
   "ClientDetails": {
     "Id": "00000000-0000-0000-0000-000000000000",
     "CompanyName": "newtest",
@@ -43,6 +48,50 @@
     "MobileNumber": "+919030629412",
     "EmailAddress": "rahultestingqa@outlook.com",
     "TaxNumber": null
+  },
+  "DocumentConfig": {
+    "Id": "5FD4D98D-43E5-4E61-B6C4-9D8623B6CE0A",
+    "ClientId": "64686CC7-E83B-4048-BC2E-5214F66401D9",
+    "InvoiceTopCompanyName": "newtest",
+    "InvoiceTopAddress": " ,,,,",
+    "InvoiceTopZipcode": "97818",
+    "InvoiceTopMobile": "919030629412",
+    "InvioceTopEmail": "rahultestingqa@outlook.com",
+    "InvoicePermitPayCompanyName": "newtest",
+    "InvoicePermitPayAddress": "",
+    "InvoicePermitZipcode": "97818",
+    "InvoicePermitMobileNo": "919030629412",
+    "InvoiceBankName": "",
+    "InvoiceAccountNumber": "987654321", // TODO fetch
+    "InvoiceSortCode": "",
+    "InvoiceSwiftOrBIC": "NULL",
+    "InvoiceIBAN": "NULL",
+    "InvoiceFooterText1": "NULL",
+    "InvoiceFooterText2": "",
+    "CreatedDate": "05/25/2022 13:28:20",
+    "ModifiedDate": "08/05/2022 12:10:46",
+    "IsDeleted": 0, //should be boolean instead of string
+    "InvoiceVATNo": "NULL",
+    "LogfilePath": "12648--LOGFILE.txt",
+    "DocumentLogoPath": "https://s3-us-west-2.amazonaws.com/storageadminlivedocs/logo1.jpg",
+    "SiteLandingURL": "NULL",
+    "StorageWebsite": "",
+    "RentalOfRoom": "Rental Of Room",
+    "AdvancePaymentDiscount": "Advance Payment",
+    "NeedWebsitebyCaddy": 0, //should be boolean instead of string
+    "RegistrationPhaseinNo": "0",
+    "DepositText": "Deposit",
+    "IsLeaseAndOtherDocumentFooterCustomized": 0, //should be boolean instead of string
+    "LeaseAndOtherDocumentFooterText": "NULL",
+    "IsLeaseAndOtherDocumentFooterBorderRequired": 1, //should be boolean instead of string
+    "EnableInvoiceRoundoffValue": 0, //should be boolean instead of string
+    "InvoiceRoundoffRange01to04": "0",
+    "InvoiceRoundoffRange05to09": "1",
+    "UploadUnitsClientFollowUp": 0, //should be boolean instead of string
+    "UploadUnitsClientFollowUpSelectedStatus": 0, //should be boolean instead of string
+    "IsLeaseAgreementFooterPageNumberEnabled": 0, //should be boolean instead of string
+    "DisplayEmailCompanyName": "NULL",
+    "QRCodeimg": "NULL"
   },
   "CustomerDetails": {
     "Id": "00000000-0000-0000-0000-000000000000",
@@ -76,7 +125,7 @@
   },
   "PastDueList": [
     {
-      "InvoiceIdGuid": "8a5b06c4-37a3-40eb-87d2-cd6b4f498d1d",
+      "InvoiceIdGuidInvoiceIdGuid": "8a5b06c4-37a3-40eb-87d2-cd6b4f498d1d",
       "InvoiceIdNum": 28,
       "ContractIdNum": 139752,
       "UnitNumber": "A2B-newbuilding",
@@ -96,5 +145,676 @@
       "Quantity": 1,
       "GrossCost": 100.00
     }
+  ],
+  "LanguageCustomizationList": [
+    {
+      "KeywordName": "BarCode128Text",
+      "VisibleStatus": 1,
+      "CustomValue": "Scan here to Pay"
+    },
+    {
+      "KeywordName": "BarCode128TextLocation",
+      "VisibleStatus": 1,
+      "CustomValue": "top"
+    },
+    {
+      "KeywordName": "Cont_insurance",
+      "VisibleStatus": 1,
+      "CustomValue": "Content insurance"
+    },
+    {
+      "KeywordName": "Deposit_transferred",
+      "VisibleStatus": 1,
+      "CustomValue": "Deposit charge transferred"
+    },
+    {
+      "KeywordName": "DisplayAccountNumber",
+      "VisibleStatus": 0,
+      "CustomValue": ""
+    },
+    {
+      "KeywordName": "DisplayAddBarCode128",
+      "VisibleStatus": 1,
+      "CustomValue": "5@account_number@invoice_total_euros@invoice_total_cents@reference_year@reference_tenant_id@reference_invoice_number@due_date"
+    },
+    {
+      "KeywordName": "DisplayAddPaymentLink",
+      "VisibleStatus": 0,
+      "CustomValue": "Click here to pay"
+    },
+    {
+      "KeywordName": "DisplayAdjustedAdvanceBalanceText",
+      "VisibleStatus": 1,
+      "CustomValue": "Balance"
+    },
+    {
+      "KeywordName": "DisplayAdjustedThruAdvance",
+      "VisibleStatus": 1,
+      "CustomValue": "Amount Adjusted through Advance"
+    },
+    {
+      "KeywordName": "DisplayAdjustedThruAdvanceDiscount",
+      "VisibleStatus": 1,
+      "CustomValue": "Discount"
+    },
+    {
+      "KeywordName": "DisplayBankdetails",
+      "VisibleStatus": 1,
+      "CustomValue": "Bankdetails"
+    },
+    {
+      "KeywordName": "DisplayCurrentDue",
+      "VisibleStatus": 1,
+      "CustomValue": "Current Due"
+    },
+    {
+      "KeywordName": "DisplayCurrentDueDiscount",
+      "VisibleStatus": 1,
+      "CustomValue": "Discount"
+    },
+    {
+      "KeywordName": "DisplayCurrentDueGrossCost",
+      "VisibleStatus": 1,
+      "CustomValue": "Gross Cost"
+    },
+    {
+      "KeywordName": "DisplayCurrentDueItem",
+      "VisibleStatus": 1,
+      "CustomValue": "Item"
+    },
+    {
+      "KeywordName": "DisplayCurrentDueNetCost",
+      "VisibleStatus": 1,
+      "CustomValue": "Net Cost"
+    },
+    {
+      "KeywordName": "DisplayCurrentDueQuantity",
+      "VisibleStatus": 1,
+      "CustomValue": "Quantity"
+    },
+    {
+      "KeywordName": "DisplayCurrentDueTaxPercent",
+      "VisibleStatus": 1,
+      "CustomValue": "Tax"
+    },
+    {
+      "KeywordName": "Display-FacilityAddress",
+      "VisibleStatus": 1,
+      "CustomValue": "Facility Address"
+    },
+    {
+      "KeywordName": "DisplayIBAN",
+      "VisibleStatus": 1,
+      "CustomValue": "IBAN"
+    },
+    {
+      "KeywordName": "Display-InvoiceTo",
+      "VisibleStatus": 0,
+      "CustomValue": "Invoice To"
+    },
+    {
+      "KeywordName": "DisplayIPTTAXText",
+      "VisibleStatus": 1,
+      "CustomValue": "Insurance Premium Tax"
+    },
+    {
+      "KeywordName": "DisplayItemizedTransferDetail",
+      "VisibleStatus": 1,
+      "CustomValue": "Transfer itemized detail"
+    },
+    {
+      "KeywordName": "DisplayLabelCreditNotedocument",
+      "VisibleStatus": 1,
+      "CustomValue": "Credit Note"
+    },
+    {
+      "KeywordName": "DisplayLabelHeaderBillingCycle",
+      "VisibleStatus": 1,
+      "CustomValue": "Billing Cycle"
+    },
+    {
+      "KeywordName": "DisplayLabelHeaderBillingPeriod",
+      "VisibleStatus": 1,
+      "CustomValue": "Billing Period"
+    },
+    {
+      "KeywordName": "DisplayLabelHeaderBillingPeriodto",
+      "VisibleStatus": 1,
+      "CustomValue": "to"
+    },
+    {
+      "KeywordName": "DisplayLabelHeaderDate",
+      "VisibleStatus": 1,
+      "CustomValue": "Date"
+    },
+    {
+      "KeywordName": "DisplayLabelHeaderInvoiceNumber",
+      "VisibleStatus": 1,
+      "CustomValue": "Invoice Number"
+    },
+    {
+      "KeywordName": "DisplayLabelHeaderNameofthedocument",
+      "VisibleStatus": 1,
+      "CustomValue": "Sales Invoice"
+    },
+    {
+      "KeywordName": "DisplayLabelHeaderPage",
+      "VisibleStatus": 1,
+      "CustomValue": "Page"
+    },
+    {
+      "KeywordName": "DisplayLabelHeaderYourReference",
+      "VisibleStatus": 0,
+      "CustomValue": ""
+    },
+    {
+      "KeywordName": "DisplayLabelScheduleMoveOutDate",
+      "VisibleStatus": 0,
+      "CustomValue": "Scheduled move out date"
+    },
+    {
+      "KeywordName": "DisplayLogo",
+      "VisibleStatus": 1,
+      "CustomValue": ""
+    },
+    {
+      "KeywordName": "DisplayMobileNumber",
+      "VisibleStatus": 1,
+      "CustomValue": "Mobile Number"
+    },
+    {
+      "KeywordName": "DisplayNoteAtLast",
+      "VisibleStatus": 1,
+      "CustomValue": ""
+    },
+    {
+      "KeywordName": "DisplayNoteForInvoice",
+      "VisibleStatus": 1,
+      "CustomValue": " "
+    },
+    {
+      "KeywordName": "DisplayPastDueBalance",
+      "VisibleStatus": 1,
+      "CustomValue": "Balance"
+    },
+    {
+      "KeywordName": "DisplayPastDueBalanceAmount",
+      "VisibleStatus": 1,
+      "CustomValue": "Past Due Balance"
+    },
+    {
+      "KeywordName": "DisplayPastDueInvoicePeriod",
+      "VisibleStatus": 1,
+      "CustomValue": "Invoice Period"
+    },
+    {
+      "KeywordName": "DisplayPastDueLatefee",
+      "VisibleStatus": 1,
+      "CustomValue": "Late fee"
+    },
+    {
+      "KeywordName": "DisplayPastDueText",
+      "VisibleStatus": 1,
+      "CustomValue": "Past Due"
+    },
+    {
+      "KeywordName": "DisplayPastDueTop",
+      "VisibleStatus": 1,
+      "CustomValue": ""
+    },
+    {
+      "KeywordName": "DisplayPastDueTotal",
+      "VisibleStatus": 1,
+      "CustomValue": "Total"
+    },
+    {
+      "KeywordName": "DisplayPastDueTotalamountDue",
+      "VisibleStatus": 1,
+      "CustomValue": "Total amount Due"
+    },
+    {
+      "KeywordName": "DisplayPastDueUnitnumber",
+      "VisibleStatus": 1,
+      "CustomValue": "Unit number"
+    },
+    {
+      "KeywordName": "DisplayPaymentDueon",
+      "VisibleStatus": 1,
+      "CustomValue": "Payment Due on"
+    },
+    {
+      "KeywordName": "DisplayQRCode",
+      "VisibleStatus": 1,
+      "CustomValue": ""
+    },
+    {
+      "KeywordName": "DisplayRemitPaymentMobile",
+      "VisibleStatus": 1,
+      "CustomValue": "1283484970"
+    },
+    {
+      "KeywordName": "DisplayRemitPaymentto",
+      "VisibleStatus": 1,
+      "CustomValue": "Remit Payment to"
+    },
+    {
+      "KeywordName": "DisplayRemitPaymenttoAddresssLine1",
+      "VisibleStatus": 1,
+      "CustomValue": " "
+    },
+    {
+      "KeywordName": "DisplayRemitPaymenttoAddresssLine2",
+      "VisibleStatus": 1,
+      "CustomValue": "  "
+    },
+    {
+      "KeywordName": "DisplayRemitPaymenttoBusinessName",
+      "VisibleStatus": 1,
+      "CustomValue": "Cube Smart Storage"
+    },
+    {
+      "KeywordName": "DisplayRemitPaymenttoCity",
+      "VisibleStatus": 1,
+      "CustomValue": ""
+    },
+    {
+      "KeywordName": "DisplayRemitPaymenttoCountry",
+      "VisibleStatus": 1,
+      "CustomValue": ""
+    },
+    {
+      "KeywordName": "DisplayRemitPaymenttoState",
+      "VisibleStatus": 1,
+      "CustomValue": ""
+    },
+    {
+      "KeywordName": "DisplayRemitPaymenttoZipCode",
+      "VisibleStatus": 1,
+      "CustomValue": "97818"
+    },
+    {
+      "KeywordName": "DisplaySortcode",
+      "VisibleStatus": 0,
+      "CustomValue": ""
+    },
+    {
+      "KeywordName": "DisplaySwiftBICCode",
+      "VisibleStatus": 0,
+      "CustomValue": ""
+    },
+    {
+      "KeywordName": "DisplayTaxExcempted",
+      "VisibleStatus": 1,
+      "CustomValue": "Tax Exempted"
+    },
+    {
+      "KeywordName": "DisplayTenantAddresssLine1",
+      "VisibleStatus": 1,
+      "CustomValue": ""
+    },
+    {
+      "KeywordName": "DisplayTenantAddresssLine2",
+      "VisibleStatus": 1,
+      "CustomValue": ""
+    },
+    {
+      "KeywordName": "DisplayTenantCity",
+      "VisibleStatus": 1,
+      "CustomValue": ""
+    },
+    {
+      "KeywordName": "DisplayTenantCompanyName",
+      "VisibleStatus": 1,
+      "CustomValue": ""
+    },
+    {
+      "KeywordName": "DisplayTenantCountry",
+      "VisibleStatus": 1,
+      "CustomValue": ""
+    },
+    {
+      "KeywordName": "DisplayTenantE-Mailaddress",
+      "VisibleStatus": 1,
+      "CustomValue": ""
+    },
+    {
+      "KeywordName": "DisplayTenantMobileNumber",
+      "VisibleStatus": 1,
+      "CustomValue": ""
+    },
+    {
+      "KeywordName": "DisplayTenantName",
+      "VisibleStatus": 1,
+      "CustomValue": ""
+    },
+    {
+      "KeywordName": "DisplayTenantState",
+      "VisibleStatus": 1,
+      "CustomValue": ""
+    },
+    {
+      "KeywordName": "DisplayTenantTaxID",
+      "VisibleStatus": 1,
+      "CustomValue": "Tax ID"
+    },
+    {
+      "KeywordName": "DisplayTenantZipCode",
+      "VisibleStatus": 1,
+      "CustomValue": ""
+    },
+    {
+      "KeywordName": "DisplayTermsConditions",
+      "VisibleStatus": 1,
+      "CustomValue": "Please note terms & conditions apply"
+    },
+    {
+      "KeywordName": "DisplayTranferAmount",
+      "VisibleStatus": 1,
+      "CustomValue": "Transfer Amount"
+    },
+    {
+      "KeywordName": "DisplayTranferBalance",
+      "VisibleStatus": 1,
+      "CustomValue": "Balance"
+    },
+    {
+      "KeywordName": "DisplayTransferUnitNumber",
+      "VisibleStatus": 1,
+      "CustomValue": "Unit #"
+    },
+    {
+      "KeywordName": "DisplayVATNumber",
+      "VisibleStatus": 1,
+      "CustomValue": "Tax"
+    },
+    {
+      "KeywordName": "InvCancelledText",
+      "VisibleStatus": 1,
+      "CustomValue": "Cancelled"
+    },
+    {
+      "KeywordName": "InvVoidedText",
+      "VisibleStatus": 1,
+      "CustomValue": ""
+    },
+    {
+      "KeywordName": "RoundOffText",
+      "VisibleStatus": 1,
+      "CustomValue": "Round Off"
+    },
+    {
+      "KeywordName": "SI_DisplayBankInfoForCash",
+      "VisibleStatus": 1,
+      "CustomValue": ""
+    },
+    {
+      "KeywordName": "SI_DisplayBankInfoForCheck",
+      "VisibleStatus": 0,
+      "CustomValue": ""
+    },
+    {
+      "KeywordName": "SI_DisplayBankInfoForCreditCard",
+      "VisibleStatus": 1,
+      "CustomValue": "CreditCard"
+    },
+    {
+      "KeywordName": "SI_DisplayBankInfoForCreditOrDebitCardTerminal",
+      "VisibleStatus": 1,
+      "CustomValue": "Terminal"
+    },
+    {
+      "KeywordName": "SI_DisplayBankInfoForMoneyOrder",
+      "VisibleStatus": 0,
+      "CustomValue": "MO"
+    },
+    {
+      "KeywordName": "SI_DisplayBankInfoForOnlineBanking",
+      "VisibleStatus": 1,
+      "CustomValue": "OnlineBanking"
+    },
+    {
+      "KeywordName": "SI_DisplayBankInfoForStandingOrder",
+      "VisibleStatus": 1,
+      "CustomValue": "SO"
+    },
+    {
+      "KeywordName": "SI_IsDisplayBankInfo",
+      "VisibleStatus": 1,
+      "CustomValue": "BankInfo"
+    },
+    {
+      "KeywordName": "sl_AddresssLine1",
+      "VisibleStatus": 1,
+      "CustomValue": "add1"
+    },
+    {
+      "KeywordName": "sl_AddresssLine2",
+      "VisibleStatus": 1,
+      "CustomValue": "add2"
+    },
+    {
+      "KeywordName": "sl_BusinessName",
+      "VisibleStatus": 1,
+      "CustomValue": "Cube Smart Storage"
+    },
+    {
+      "KeywordName": "sl_City",
+      "VisibleStatus": 1,
+      "CustomValue": "city"
+    },
+    {
+      "KeywordName": "sl_Country",
+      "VisibleStatus": 1,
+      "CustomValue": "country"
+    },
+    {
+      "KeywordName": "sl_Displayforbusinessuser",
+      "VisibleStatus": 1,
+      "CustomValue": "b user"
+    },
+    {
+      "KeywordName": "sl_E-Mailaddress",
+      "VisibleStatus": 1,
+      "CustomValue": "CubeSmartStorage@outlook.com"
+    },
+    {
+      "KeywordName": "sl_MobileNumber",
+      "VisibleStatus": 1,
+      "CustomValue": "1283484970"
+    },
+    {
+      "KeywordName": "sl_State",
+      "VisibleStatus": 1,
+      "CustomValue": "st"
+    },
+    {
+      "KeywordName": "sl_taxorvatcheck",
+      "VisibleStatus": 0,
+      "CustomValue": "sl_taxorvatcheck"
+    },
+    {
+      "KeywordName": "sl_ZipCode",
+      "VisibleStatus": 1,
+      "CustomValue": "97818"
+    },
+    {
+      "KeywordName": "SlmInv_DisplayIPTAlongWithRentalTax",
+      "VisibleStatus": 0,
+      "CustomValue": "Display IPT Along With Rental Tax"
+    },
+    {
+      "KeywordName": "SlmInv_TotalTax",
+      "VisibleStatus": 0,
+      "CustomValue": "Total Tax"
+    },
+    {
+      "KeywordName": "slminv_TotalwithoutRoundOffText",
+      "VisibleStatus": 1,
+      "CustomValue": "Sub Total"
+    },
+    {
+      "KeywordName": "SlminvRoundOff",
+      "VisibleStatus": 1,
+      "CustomValue": "Round Off"
+    },
+    {
+      "KeywordName": "slr_Reservation_fee_applied",
+      "VisibleStatus": 1,
+      "CustomValue": "Reservation fee applied"
+    },
+    {
+      "KeywordName": "TaxorVat",
+      "VisibleStatus": 1,
+      "CustomValue": "sl_taxorvat"
+    },
+    {
+      "KeywordName": "TotalWithoutRoundOffText",
+      "VisibleStatus": 1,
+      "CustomValue": "Sub Total"
+    },
+    {
+      "KeywordName": "Unit_Rent_Transferred",
+      "VisibleStatus": 1,
+      "CustomValue": "Unit Rent charge transferred"
+    }
+  ],
+
+  "ClientPaymentMode": [
+    {
+      "ClientPaymodeId": "C6B76E71-FEC4-4698-9A41-1CADD53F103F",
+      "AdminPaymodeId": "EF8EF0BB-C6D3-46E0-815D-E2A88080A9FA",
+      "ClientId": "64686CC7-E83B-4048-BC2E-5214F66401D9",
+      "ValueText": "Cash",
+      "DisplayText": "Cash",
+      "IsDeleted": 0,
+      "IsCommon": 1,
+      "IsDisplayMerchandise": 1,
+      "IsDisplayInReservation": 1,
+      "IsDisplayInRefund": 1,
+      "IsDisplayInPaymentSearch": 0,
+      "IsDisplayInCustomerPortal": 0,
+      "IsDisplayOnlineSales": 0
+    },
+    {
+      "ClientPaymodeId": "DEF7193D-6AD3-4011-9DF6-30ADD38DA08A",
+      "AdminPaymodeId": "EE6AB1EF-4385-4E40-88E1-695152E79D47",
+      "ClientId": "64686CC7-E83B-4048-BC2E-5214F66401D9",
+      "ValueText": "MoneyOrder",
+      "DisplayText": "Money Order",
+      "IsDeleted": 0,
+      "IsCommon": 1,
+      "IsDisplayMerchandise": 1,
+      "IsDisplayInReservation": 1,
+      "IsDisplayInRefund": 1,
+      "IsDisplayInPaymentSearch": 0,
+      "IsDisplayInCustomerPortal": 0,
+      "IsDisplayOnlineSales": 0
+    },
+    {
+      "ClientPaymodeId": "81C6F8E6-C215-4846-B2A4-33F1F14158A1",
+      "AdminPaymodeId": "6A53D906-D5DB-4E4E-9A75-848DB8155B26",
+      "ClientId": "64686CC7-E83B-4048-BC2E-5214F66401D9",
+      "ValueText": "CreditCard",
+      "DisplayText": "Credit Card",
+      "IsDeleted": 0,
+      "IsCommon": 1,
+      "IsDisplayMerchandise": 1,
+      "IsDisplayInReservation": 0,
+      "IsDisplayInRefund": 0,
+      "IsDisplayInPaymentSearch": 0,
+      "IsDisplayInCustomerPortal": 1,
+      "IsDisplayOnlineSales": 0
+    },
+    {
+      "ClientPaymodeId": "4591FB16-8600-43B6-A9E1-6C65FBBD525F",
+      "AdminPaymodeId": "B0B7B119-91DA-4AEE-991E-3EE0432D14B8",
+      "ClientId": "64686CC7-E83B-4048-BC2E-5214F66401D9",
+      "ValueText": "Check",
+      "DisplayText": "Check",
+      "IsDeleted": 0,
+      "IsCommon": 1,
+      "IsDisplayMerchandise": 1,
+      "IsDisplayInReservation": 0,
+      "IsDisplayInRefund": 1,
+      "IsDisplayInPaymentSearch": 0,
+      "IsDisplayInCustomerPortal": 0,
+      "IsDisplayOnlineSales": 0
+    },
+    {
+      "ClientPaymodeId": "6253DFAD-73B5-4068-82E2-6CC0A9426144",
+      "AdminPaymodeId": "A34C3726-69FD-4897-BC94-2BBF2BD783DB",
+      "ClientId": "64686CC7-E83B-4048-BC2E-5214F66401D9",
+      "ValueText": "PayLater",
+      "DisplayText": "Pay Later",
+      "IsDeleted": 0,
+      "IsCommon": 1,
+      "IsDisplayMerchandise": 1,
+      "IsDisplayInReservation": 1,
+      "IsDisplayInRefund": 0,
+      "IsDisplayInPaymentSearch": 0,
+      "IsDisplayInCustomerPortal": 1,
+      "IsDisplayOnlineSales": 0
+    },
+    {
+      "ClientPaymodeId": "AF100D45-3619-495B-A86F-C7930C392B5E",
+      "AdminPaymodeId": "C8500657-56D4-49BB-BEAE-29B79460EC28",
+      "ClientId": "64686CC7-E83B-4048-BC2E-5214F66401D9",
+      "ValueText": "DirectDebit",
+      "DisplayText": "Direct Debit",
+      "IsDeleted": 0,
+      "IsCommon": 0,
+      "IsDisplayMerchandise": 0,
+      "IsDisplayInReservation": 0,
+      "IsDisplayInRefund": 0,
+      "IsDisplayInPaymentSearch": 0,
+      "IsDisplayInCustomerPortal": 0,
+      "IsDisplayOnlineSales": 0
+    },
+    {
+      "ClientPaymodeId": "0B13184B-74C0-4FA8-8000-D958AB417F13",
+      "AdminPaymodeId": "B67FC4CE-49CF-4B2C-9B43-06BEE1454E0F",
+      "ClientId": "64686CC7-E83B-4048-BC2E-5214F66401D9",
+      "ValueText": "CreditOrDebitCardTerminal",
+      "DisplayText": "Credit or Debitcard Terminal",
+      "IsDeleted": 0,
+      "IsCommon": 1,
+      "IsDisplayMerchandise": 1,
+      "IsDisplayInReservation": 0,
+      "IsDisplayInRefund": 1,
+      "IsDisplayInPaymentSearch": 0,
+      "IsDisplayInCustomerPortal": 0,
+      "IsDisplayOnlineSales": 0
+    },
+    {
+      "ClientPaymodeId": "29D9F129-5CC3-4F98-A89F-E470A2C47AF0",
+      "AdminPaymodeId": "623AF7AF-A0AB-4267-BF2B-1777FE64CDD2",
+      "ClientId": "64686CC7-E83B-4048-BC2E-5214F66401D9",
+      "ValueText": "OnlineBanking",
+      "DisplayText": "Online Banking",
+      "IsDeleted": 0,
+      "IsCommon": 1,
+      "IsDisplayMerchandise": 1,
+      "IsDisplayInReservation": 0,
+      "IsDisplayInRefund": 1,
+      "IsDisplayInPaymentSearch": 0,
+      "IsDisplayInCustomerPortal": 0,
+      "IsDisplayOnlineSales": 0
+    },
+    {
+      "ClientPaymodeId": "6B3720B1-533E-4942-B512-F1B75720DB00",
+      "AdminPaymodeId": "409F3EBB-FE72-4F07-844B-2B4E9ADA2D2E",
+      "ClientId": "64686CC7-E83B-4048-BC2E-5214F66401D9",
+      "ValueText": "StandingOrder",
+      "DisplayText": "Standing Order",
+      "IsDeleted": 0,
+      "IsCommon": 1,
+      "IsDisplayMerchandise": 0,
+      "IsDisplayInReservation": 0,
+      "IsDisplayInRefund": 1,
+      "IsDisplayInPaymentSearch": 0,
+      "IsDisplayInCustomerPortal": 0,
+      "IsDisplayOnlineSales": 0
+    }
   ]
+
 }

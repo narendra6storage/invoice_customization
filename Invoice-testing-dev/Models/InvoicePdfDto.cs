@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Invoice_testing_dev.Models;
 
 namespace SixStorage.AutoInvoice.WebApi.Shared.DTOs.AutoInvoice;
 
@@ -15,8 +16,65 @@ public class InvoicePdfDto
         RemitPaymentTo = new PersonalDetails();
         PastDueList = new List<PastDueDetails>();
         InvoiceItemList = new List<InvoiceItemDetails>();
-    }
+        LanguageCustomizationList = new List<InvoiceLanguageCustomization>();
+        DocumentConfig = new ClientAppAndDocumentConfig();
+        clientPaymentMode = new List<ClientPaymentMode>();
+        //InvoiceDetail = new ContractInvoiceDetails();
+}
 
+    public bool GetDictionaryVisibility(string keyword)
+    {
+        bool result = false;
+        try
+        {
+            if (LanguageCustomizationList != null)
+            {
+                if (LanguageCustomizationList.Count > 0)
+                {
+                    if (!string.IsNullOrEmpty(keyword))
+                    {
+                        keyword = keyword.Trim();
+                        var firstData = LanguageCustomizationList.FirstOrDefault(x => x.KeywordName.ToLower() == keyword.ToLower());
+                        if (firstData != null)
+                        {
+                            result = firstData.VisibleStatus;
+                        }
+                    }
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            //objCommon.WriteExceptionLog(ex, "GetDicionaryVisibleStatus");
+            return false;
+        }
+        return result;
+    }
+    public string GetDictionaryItem(string keywordName)
+    {
+        string result = string.Empty;
+        try
+        {
+            if (LanguageCustomizationList.Count > 0)
+            {
+                if (!string.IsNullOrEmpty(keywordName))
+                {
+                    keywordName = keywordName.Trim();
+                    var firstData = LanguageCustomizationList.FirstOrDefault(x => x.KeywordName.ToLower() == keywordName.ToLower());
+                    if (firstData != null)
+                    {
+                        result = firstData.CustomValue;
+                    }
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            //objCommon.WriteExceptionLog(ex, "GetDictionaryItem");
+            return String.Empty;
+        }
+        return result;
+    }
     public string DateFormat
     {
         get
@@ -24,7 +82,6 @@ public class InvoicePdfDto
             return "MM/dd/yyyy";
         }
     }
-
     public string CurrentDateStr
     {
         get
@@ -32,7 +89,6 @@ public class InvoicePdfDto
             return DateTime.Today.ToString(DateFormat);
         }
     }
-
     public bool IsMergedInvoice { get; set; }
     public Guid InvoiceIdGuid { get; set; }
     public long InvoiceIdNum { get; set; }
@@ -50,6 +106,7 @@ public class InvoicePdfDto
             return InvoiceDate.ToString(DateFormat);
         }
     }
+    public string Paymenttype { get; set; }
     public string? BillingCycle { get; set; }
     public string? BillingCycleType { get; set; }
     public DateTime BillingPeriodFrom { get; set; }
@@ -117,14 +174,24 @@ public class InvoicePdfDto
         }
     }
 
+    public decimal Insurance { get; set; } //TODO added newly
+    public decimal lateFeeAmount { get; set; } //TODO added newly
+
     public string? FooterText1 { get; set; }
     public string? FooterText2 { get; set; }
+
+    public string TenantId { get; set; } // TODO is it string or GUID?
 
     public PersonalDetails ClientDetails { get; set; }
     public PersonalDetails CustomerDetails { get; set; }
     public PersonalDetails RemitPaymentTo { get; set; }
     public List<PastDueDetails> PastDueList { get; set; }
     public List<InvoiceItemDetails> InvoiceItemList { get; set; }
+    public List<InvoiceLanguageCustomization> LanguageCustomizationList { get; set; }
+    public ClientAppAndDocumentConfig DocumentConfig { get; set; }
+    public List<ClientPaymentMode> clientPaymentMode { get; set; }
+    //public ContractInvoiceDetails InvoiceDetail { get; set; }
+
 }
 
 public class PersonalDetails
@@ -187,3 +254,11 @@ public static class CurrencyHelper
         return $"${amount.ToString("0.00")}";
     }
 }
+
+public class InvoiceLanguageCustomization
+{
+    public string KeywordName { get; set; }
+    public string CustomValue { get; set; }
+    public bool VisibleStatus { get; set; }
+}
+

@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Prasanna\\Prasan Projects\\Invoice-testing-dev\\Invoice-testing-dev\\Invoice-testing-dev.csproj": {}
+    "C:\\VS.net projects\\invoice_testing_dev_code\\invoice_customization\\Invoice-testing-dev\\Invoice-testing-dev.csproj": {}
   },
   "projects": {
-    "C:\\Prasanna\\Prasan Projects\\Invoice-testing-dev\\Invoice-testing-dev\\Invoice-testing-dev.csproj": {
+    "C:\\VS.net projects\\invoice_testing_dev_code\\invoice_customization\\Invoice-testing-dev\\Invoice-testing-dev.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Prasanna\\Prasan Projects\\Invoice-testing-dev\\Invoice-testing-dev\\Invoice-testing-dev.csproj",
+        "projectUniqueName": "C:\\VS.net projects\\invoice_testing_dev_code\\invoice_customization\\Invoice-testing-dev\\Invoice-testing-dev.csproj",
         "projectName": "Invoice-testing-dev",
-        "projectPath": "C:\\Prasanna\\Prasan Projects\\Invoice-testing-dev\\Invoice-testing-dev\\Invoice-testing-dev.csproj",
+        "projectPath": "C:\\VS.net projects\\invoice_testing_dev_code\\invoice_customization\\Invoice-testing-dev\\Invoice-testing-dev.csproj",
         "packagesPath": "C:\\Users\\User\\.nuget\\packages\\",
-        "outputPath": "C:\\Prasanna\\Prasan Projects\\Invoice-testing-dev\\Invoice-testing-dev\\obj\\",
+        "outputPath": "C:\\VS.net projects\\invoice_testing_dev_code\\invoice_customization\\Invoice-testing-dev\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "C:\\Users\\User\\AppData\\Roaming\\NuGet\\NuGet.Config",
@@ -43,6 +43,14 @@
             "Newtonsoft.Json": {
               "target": "Package",
               "version": "[13.0.1, )"
+            },
+            "System.Drawing.Common": {
+              "target": "Package",
+              "version": "[6.0.0, )"
+            },
+            "Zen.Barcode.Core": {
+              "target": "Package",
+              "version": "[2.0.0, )"
             }
           },
           "imports": [
@@ -51,7 +59,8 @@
             "net47",
             "net471",
             "net472",
-            "net48"
+            "net48",
+            "net481"
           ],
           "assetTargetFallback": true,
           "warn": true,
@@ -63,7 +72,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\6.0.301\\RuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\6.0.401\\RuntimeIdentifierGraph.json"
         }
       }
     }
