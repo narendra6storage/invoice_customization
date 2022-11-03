@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -21,6 +22,11 @@ public class InvoicePdfDto
         clientPaymentMode = new List<ClientPaymentMode>();
         //InvoiceDetail = new ContractInvoiceDetails();
 }
+
+    public bool GetDictionaryVisibleStatus(string keyword)
+    {
+        return GetDictionaryVisibility(keyword);
+    }
 
     public bool GetDictionaryVisibility(string keyword)
     {
@@ -89,6 +95,10 @@ public class InvoicePdfDto
             return DateTime.Today.ToString(DateFormat);
         }
     }
+
+    public bool RoundOffEnabled { get; set; }
+    public decimal InvTaxPercentage { get; set; }
+    public bool DisplayTax { get; set; }//objOverallConfigData.clientApplicationmenuconfig.DisplayTax
     public bool IsMergedInvoice { get; set; }
     public Guid InvoiceIdGuid { get; set; }
     public long InvoiceIdNum { get; set; }
@@ -99,6 +109,7 @@ public class InvoicePdfDto
     public long ContractId { get; set; }
     public string? ClientLogoPath { get; set; }
     public DateTime InvoiceDate { get; set; }
+    public Location UnitLocationInfo { get; set; }
     public string InvoiceDateStr
     {
         get
@@ -108,6 +119,7 @@ public class InvoicePdfDto
     }
     public string Paymenttype { get; set; }
     public string? BillingCycle { get; set; }
+    public bool IsEnabledMultipleTax { get; set; }
     public string? BillingCycleType { get; set; }
     public DateTime BillingPeriodFrom { get; set; }
     public DateTime BillingPeriodTo { get; set; }
@@ -182,6 +194,15 @@ public class InvoicePdfDto
 
     public string TenantId { get; set; } // TODO is it string or GUID?
 
+    public string CultureCurrencySymbol { get; set; }
+
+    public string Building { get; set; }
+
+    public string hideandshow { get; set; }
+    public string exportHideandshow { get; set; }
+
+    public CultureInfo CurrentCulture { get; set; }
+    public UnitWithStatus UnitStorageTypeInfo { get; set; }
     public PersonalDetails ClientDetails { get; set; }
     public PersonalDetails CustomerDetails { get; set; }
     public PersonalDetails RemitPaymentTo { get; set; }
@@ -190,8 +211,11 @@ public class InvoicePdfDto
     public List<InvoiceLanguageCustomization> LanguageCustomizationList { get; set; }
     public ClientAppAndDocumentConfig DocumentConfig { get; set; }
     public List<ClientPaymentMode> clientPaymentMode { get; set; }
-    //public ContractInvoiceDetails InvoiceDetail { get; set; }
+    public ContractInvoiceDetails InvoiceDetail { get; set; }
+    public List<InvoiceAppliedTaxDetail> InvoiceAppliedTaxDetails { get; set; }
 
+    public List<ClientFieldConfig> optionalFields { get; set; }
+    public ClientOverallConfig ConfigurationData { get; set; }
 }
 
 public class PersonalDetails
