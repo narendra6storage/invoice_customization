@@ -248,8 +248,10 @@
         locationName = Model.UnitLocationInfo.Location1;
         FacilityTaxId = Model.UnitLocationInfo.FacilityTaxId;
     }
-    string appEnvironment = ConfigurationManager.AppSettings["APPENVIRONMENT"];
+    
+    string appEnvironment = "LIVE"; //CHECK
 }
+
 @if (!objOverallConfigData.AccountSettingsTable4.IsActivateNewUI)
 {
     <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" rel="stylesheet" />
@@ -545,6 +547,7 @@
         var Latefee = Model.lateFeeAmount;
         var invoiceDetail = Model.InvoiceDetail;
         var insurance = Model.Insurance;
+
         if (invoiceDetail != null && insurance != null)
         {
             invoiceDetail.InsuranceCharges = insurance.InsuranceAmount;
@@ -567,19 +570,20 @@
         string invoiceToDate = invoiceDetail.InvPeriodTo != null ? Convert.ToDateTime(invoiceDetail.InvPeriodTo).ToShortDateString() : "-";
         string invoiceDueDate = invoiceDetail.InvoiceDueDate != null ? Convert.ToDateTime(invoiceDetail.InvoiceDueDate).ToShortDateString() : "-";
         string PaymentPeriod = (InvoiceFromDate == "-" && invoiceToDate == "-") ? "-" : InvoiceFromDate + " to " + invoiceToDate;
-        
+
         var estimatedTerminationDate = Model.EstimatedTerminationDate != null ? 
             Convert.ToDateTime(Model.EstimatedTerminationDate).ToShortDateString() : "-";
 
-        string CustomerLastName = (Model.CustomerLastName != null) ? Model.CustomerLastName : "";
-        string CustomerAddress = Model.CustomerAddress != null ? Model.CustomerAddress : "";
-        string CustomerZip = Model.CustomerZip != null ? Model.CustomerZip : "";
+        string CustomerLastName = Model.CustomerDetails?.LastName ?? string.Empty;
+        string CustomerAddress = Model.CustomerDetails?.AddressLine1 ?? string.Empty;
+        string CustomerZip = Model.CustomerDetails?.Zipcode ?? string.Empty;
+
         string[] addressLine = new string[10];
-        string addressline3 = Model.CustomerAddress;
+        string addressline3 = Model.CustomerDetails?.AddressLine1 ?? string.Empty;
         string[] CustAddress = CustomerAddress.Split(',');//Added by Desala on 10/12/2017
         string address = string.Empty;
-        string city = string.Empty;
-        string state = string.Empty;
+        string city = Model.CustomerDetails?.City ?? string.Empty;
+        string state = Model.CustomerDetails?.State ?? string.Empty;
 
         try
         {
@@ -589,15 +593,15 @@
                 addressLine = CustomerAddress.Split(new[] { '\r', '\n' });
                 for (int i = 0; i < addressLine.Length; i++)
                 {
-                    if (i == 0)
+                    if (i == 0 && string.IsNullOrWhiteSpace(address))
                     {
                         address = addressLine[0];
                     }
-                    if (i == 1)
+                    if (i == 1 && string.IsNullOrWhiteSpace(city))
                     {
                         city = addressLine[1];
                     }
-                    if (i == 2)
+                    if (i == 2 && string.IsNullOrWhiteSpace(state))
                     {
                         state = addressLine[2];
                     }
@@ -662,6 +666,7 @@
         }
 
         var displayBusinessCompanyName = "display:none";
+
         if (Model.IsBussinessUser == true)
         {
             displayBusinessCompanyName = "display:block";
@@ -723,12 +728,12 @@
                                     @if (Convert.ToString(loginclientId).ToUpper() == "C7D6EC8C-CAB1-42F8-B127-FC123A2560DB")
                                     {
                                         <td>
-                                            @if (Model.GetDictionaryVisibleStatus(TranslationKeywordSetup, "sl_MobileNumber") && !string.IsNullOrEmpty(documentConfig.InvoiceTopMobile))
+                                            @if (Model.GetDictionaryVisibleStatus( "sl_MobileNumber") && !string.IsNullOrEmpty(documentConfig.InvoiceTopMobile))
                                             {
                                                 <span>  @documentConfig.InvoiceTopMobile</span><br />
                                             }
 
-                                            @if (Model.GetDictionaryVisibleStatus(TranslationKeywordSetup, "sl_E-Mailaddress") && !string.IsNullOrEmpty(documentConfig.InvioceTopEmail))
+                                            @if (Model.GetDictionaryVisibleStatus( "sl_E-Mailaddress") && !string.IsNullOrEmpty(documentConfig.InvioceTopEmail))
                                             {
                                                 <span>@Html.Raw(documentConfig.InvioceTopEmail)</span><br />
                                             }
@@ -737,12 +742,12 @@
                                     else
                                     {
                                         <td style="padding-top:10px;">
-                                            @if (Model.GetDictionaryVisibleStatus(TranslationKeywordSetup, "sl_MobileNumber") && !string.IsNullOrEmpty(documentConfig.InvoiceTopMobile))
+                                            @if (Model.GetDictionaryVisibleStatus( "sl_MobileNumber") && !string.IsNullOrEmpty(documentConfig.InvoiceTopMobile))
                                             {
                                                 <span>  @documentConfig.InvoiceTopMobile</span><br />
                                             }
 
-                                            @if (Model.GetDictionaryVisibleStatus(TranslationKeywordSetup, "sl_E-Mailaddress") && !string.IsNullOrEmpty(documentConfig.InvioceTopEmail))
+                                            @if (Model.GetDictionaryVisibleStatus( "sl_E-Mailaddress") && !string.IsNullOrEmpty(documentConfig.InvioceTopEmail))
                                             {
                                                 <span>@Html.Raw(documentConfig.InvioceTopEmail)</span><br />
                                             }
@@ -759,7 +764,7 @@
                                     {
                                         <td style="text-align:left;padding-top:4px !important;display:block;" valign="top" id="imgtd">
                                             @*added by shiva for cb lockers changes*@
-                                            @if (Model.GetDictionaryVisibleStatus(TranslationKeywordSetup, "DisplayLogo"))
+                                            @if (Model.GetDictionaryVisibleStatus( "DisplayLogo"))
                                             {
                                                 <img src="@PrintLogoPath" style="width:250px;height:auto;" id="imglogo" alt="6Storage.Com">
                                             }
@@ -767,11 +772,11 @@
                                         </td>
                                     }
                                 </tr>
-                                @if (Model.GetDictionaryVisibleStatus(TranslationKeywordSetup, "Display-FacilityAddress"))
+                                @if (Model.GetDictionaryVisibleStatus( "Display-FacilityAddress"))
                                 {
                                     <tr>
                                         <td>
-                                            <span style="text-align:left;font-weight:bold;text-decoration:underline"><b>@Html.Raw(Model.GetDictionaryItem(TranslationKeywordSetup, "Display-FacilityAddress")) :</b></span>
+                                            <span style="text-align:left;font-weight:bold;text-decoration:underline"><b>@Html.Raw(Model.GetDictionaryItem( "Display-FacilityAddress")) :</b></span>
                                         </td>
                                     </tr>
                                 }
@@ -791,16 +796,16 @@
                                                     || Convert.ToString(loginclientId).ToUpper() == "CA3FE9ED-ED44-44BD-A11B-F6E7D77B7B88"
                                                     || Convert.ToString(loginclientId).ToUpper() == "02C3394D-1C07-445C-A1EA-EF49773D88BA") ? "" : ",";
                                             }
-                                            @if (Model.GetDictionaryVisibleStatus(TranslationKeywordSetup, "sl_BusinessName"))
+                                            @if (Model.GetDictionaryVisibleStatus( "sl_BusinessName"))
                                             {
                                                 <span> @Html.Raw(documentConfig.InvoiceTopCompanyName) <br /> </span>
                                             }
 
                                             @*@Html.Raw(topAddress)*@
                                             @{
-                                                var isaddress2visible = Model.GetDictionaryVisibleStatus(TranslationKeywordSetup, "sl_AddresssLine2");
+                                                var isaddress2visible = Model.GetDictionaryVisibleStatus( "sl_AddresssLine2");
                                             }
-                                            @if (Model.GetDictionaryVisibleStatus(TranslationKeywordSetup, "sl_AddresssLine1") && !string.IsNullOrEmpty(baddress1))
+                                            @if (Model.GetDictionaryVisibleStatus( "sl_AddresssLine1") && !string.IsNullOrEmpty(baddress1))
                                             {
                                                 <span>@Html.Raw(baddress1)@comma </span>
 
@@ -812,7 +817,7 @@
 
                                             }
 
-                                            @if (Model.GetDictionaryVisibleStatus(TranslationKeywordSetup, "sl_AddresssLine2") && !string.IsNullOrEmpty(baddress2))
+                                            @if (Model.GetDictionaryVisibleStatus( "sl_AddresssLine2") && !string.IsNullOrEmpty(baddress2))
                                             {
                                                 <br />
                                                 <span>
@@ -1161,7 +1166,7 @@
                                         <span style="font-size:11px;font-family:arial;font-weight:normal;">
                                             @if (Model.GetDictionaryVisibleStatus( "DisplayTenantName"))
                                             {
-                                                <span>@Model.CustomerFirstName @CustomerLastName <br /></span>
+                                                <span>@Model.CustomerDetails?.FirstName @CustomerLastName <br /></span>
                                             }
 
 
@@ -1212,34 +1217,34 @@
                                             }
                                             else if (Convert.ToString(loginclientId).ToUpper() == "02C3394D-1C07-445C-A1EA-EF49773D88BA")
                                             {
-                                                @Model.CustomerFirstName @CustomerLastName <br />
+                                                @Model.CustomerDetails.FirstName @CustomerLastName <br />
                                                 if (!string.IsNullOrEmpty(Model.BusinessCompanyName))
                                                 {
                                                     @Model.BusinessCompanyName <br />
                                                 }
-                                                if (!string.IsNullOrEmpty(Model.CustomerAddressLine1))
+                                                if (!string.IsNullOrEmpty(Model.CustomerDetails?.AddressLine1))
                                                 {
-                                                    @Html.Raw(Model.CustomerAddressLine1)<br />
+                                                    @Html.Raw(Model.CustomerDetails?.AddressLine1)<br />
                                                 }
-                                                if (!string.IsNullOrEmpty(Model.CustomerAddressLine2))
+                                                if (!string.IsNullOrEmpty(Model.CustomerDetails?.AddressLine2))
                                                 {
-                                                    @Html.Raw(Model.CustomerAddressLine2)<br />
+                                                    @Html.Raw(Model.CustomerDetails?.AddressLine2)<br />
                                                 }
-                                                if (!string.IsNullOrEmpty(Model.CustomerCity))
+                                                if (!string.IsNullOrEmpty(Model.CustomerDetails?.City))
                                                 {
-                                                    @Html.Raw(Model.CustomerCity) <br />
+                                                    @Html.Raw(Model.CustomerDetails?.City) <br />
                                                 }
-                                                if (!string.IsNullOrEmpty(Model.CustomerState))
+                                                if (!string.IsNullOrEmpty(Model.CustomerDetails?.State))
                                                 {
-                                                    @Html.Raw(Model.CustomerState)<br />
+                                                    @Html.Raw(Model.CustomerDetails?.State)<br />
                                                 }
-                                                if (!string.IsNullOrEmpty(Model.CustomerState))
+                                                if (!string.IsNullOrEmpty(Model.CustomerDetails?.Zipcode))
                                                 {
-                                                    @Html.Raw(Model.CustomerZip)<br />
+                                                    @Html.Raw(Model.CustomerDetails?.Zipcode)<br />
                                                 }
-                                                if (!string.IsNullOrEmpty(Model.CustomerZip))
+                                                if (!string.IsNullOrEmpty(Model.CustomerDetails?.Country))
                                                 {
-                                                    @Html.Raw(Model.CustomerCountry) <br />
+                                                    @Html.Raw(Model.CustomerDetails?.Country) <br />
                                                 }
                                             }
                                             else
@@ -1265,8 +1270,11 @@
                                                 }
                                                 //changes by shiva for clientdocument northern montana they want to comma in address
                                                 var comma = "";
-                                                if (Convert.ToString(loginclientId).ToUpper() == "D738C95B-1AAF-4FA3-BB16-8ABD783C11BD" || Convert.ToString(loginclientId).ToUpper() == "5E824297-5808-4C04-8F4B-D82D043F6DD8"
-                                                    || Convert.ToString(loginclientId).ToUpper() == "1440AB2F-4FD9-4497-BBF2-B2A25CB0916F" || Convert.ToString(loginclientId).ToUpper() == "4D28184D-8942-42EE-984F-39ABEE023596" || Convert.ToString(loginclientId).ToUpper() == "CA3FE9ED-ED44-44BD-A11B-F6E7D77B7B88")
+                                                if (Convert.ToString(loginclientId).ToUpper() == "D738C95B-1AAF-4FA3-BB16-8ABD783C11BD" || 
+                                                Convert.ToString(loginclientId).ToUpper() == "5E824297-5808-4C04-8F4B-D82D043F6DD8" || 
+                                                Convert.ToString(loginclientId).ToUpper() == "1440AB2F-4FD9-4497-BBF2-B2A25CB0916F" || 
+                                                Convert.ToString(loginclientId).ToUpper() == "4D28184D-8942-42EE-984F-39ABEE023596" || 
+                                                Convert.ToString(loginclientId).ToUpper() == "CA3FE9ED-ED44-44BD-A11B-F6E7D77B7B88")
                                                 {
                                                     comma = ",";
                                                 }
@@ -1279,20 +1287,27 @@
                                                         <br />
                                                     }
                                                 }
+
                                                 //added by shiva for client document komora they want to country in next and zip code last.(26-03-2019)
-                                                if (Convert.ToString(loginclientId).ToUpper() == "1440AB2F-4FD9-4497-BBF2-B2A25CB0916F" || Convert.ToString(loginclientId).ToUpper() == "67810EF0-6518-43E4-B9DF-5E28730321B8")
+                                                if (Convert.ToString(loginclientId).ToUpper() == "1440AB2F-4FD9-4497-BBF2-B2A25CB0916F" || 
+                                                Convert.ToString(loginclientId).ToUpper() == "67810EF0-6518-43E4-B9DF-5E28730321B8")
                                                 {
-                                                    if (!string.IsNullOrEmpty(Country) && Model.GetDictionaryVisibleStatus( "DisplayTenantCountry") && !string.IsNullOrEmpty(CustAddress[3]))
+                                                    if (!string.IsNullOrEmpty(Country) && Model.GetDictionaryVisibleStatus( "DisplayTenantCountry") && 
+                                                    !string.IsNullOrEmpty(CustAddress[3]))
                                                     {
                                                         @CustAddress[3]@comma
                                                     }
                                                 }
-                                                if (!string.IsNullOrEmpty(Zipcode) && Model.GetDictionaryVisibleStatus( "DisplayTenantZipCode") && !string.IsNullOrEmpty(CustomerZip))
+
+                                                if (!string.IsNullOrEmpty(Zipcode) && 
+                                                Model.GetDictionaryVisibleStatus( "DisplayTenantZipCode") && 
+                                                !string.IsNullOrEmpty(CustomerZip))
                                                 {
                                                     if (Convert.ToString(loginclientId).ToUpper() == "67810EF0-6518-43E4-B9DF-5E28730321B8")
                                                     {
                                                         <br />
                                                     }
+
                                                     if (Convert.ToString(loginclientId).ToUpper() == "D738C95B-1AAF-4FA3-BB16-8ABD783C11BD"
                                                         || Convert.ToString(loginclientId).ToUpper() == "5E824297-5808-4C04-8F4B-D82D043F6DD8"
                                                         || Convert.ToString(loginclientId).ToUpper() == "1440AB2F-4FD9-4497-BBF2-B2A25CB0916F"
@@ -1312,9 +1327,11 @@
                                                     {
                                                     <span>,</span>
                                                     }*@
-                                                if (Convert.ToString(loginclientId).ToUpper() != "1440AB2F-4FD9-4497-BBF2-B2A25CB0916F" && Convert.ToString(loginclientId).ToUpper() != "67810EF0-6518-43E4-B9DF-5E28730321B8")
+                                                if (Convert.ToString(loginclientId).ToUpper() != "1440AB2F-4FD9-4497-BBF2-B2A25CB0916F" && 
+                                                Convert.ToString(loginclientId).ToUpper() != "67810EF0-6518-43E4-B9DF-5E28730321B8")
                                                 {
-                                                    if (!string.IsNullOrEmpty(Country) && Model.GetDictionaryVisibleStatus( "DisplayTenantCountry") && !string.IsNullOrEmpty(CustAddress[3]))
+                                                    if (!string.IsNullOrEmpty(Country) && Model.GetDictionaryVisibleStatus( "DisplayTenantCountry") && 
+                                                    !string.IsNullOrEmpty(CustAddress[3]))
                                                     {
                                                         @CustAddress[3]
                                                     }
@@ -1331,27 +1348,33 @@
                                 <tr>
                                     <td style="padding-top:10px;">
                                         <table>
-                                            @if (Model.GetDictionaryVisibleStatus( "DisplayTenantMobileNumber") && !string.IsNullOrEmpty(Model.CustomerPhone))
+                                            @if (Model.GetDictionaryVisibleStatus( "DisplayTenantMobileNumber") && 
+                                            !string.IsNullOrEmpty(Model.CustomerDetails?.MobileNumber))
                                             {
                                                 <tr>
                                                     <td style="padding:0px;">
-                                                        <span>@Model.CustomerPhone <br /></span>
+                                                        <span>@Model.CustomerDetails?.MobileNumber <br /></span>
                                                     </td>
                                                 </tr>
                                             }
-                                            @if (Model.GetDictionaryVisibleStatus( "DisplayTenantE-Mailaddress") && !string.IsNullOrEmpty(Model.CustomerEmail))
+                                            
+                                            @if (Model.GetDictionaryVisibleStatus( "DisplayTenantE-Mailaddress") && 
+                                            !string.IsNullOrEmpty(Model.CustomerDetails?.EmailAddress))
                                             {
                                                 <tr>
                                                     <td style="padding:0px;">
-                                                        <span>@Model.CustomerEmail <br /></span>
+                                                        <span>@Model.CustomerDetails?.EmailAddress <br /></span>
                                                     </td>
                                                 </tr>
                                             }
-                                            @if (Model.GetDictionaryVisibleStatus( "DisplayTenantTaxID") && !string.IsNullOrEmpty(Model.TaxId))
+                                            
+                                            @if (Model.GetDictionaryVisibleStatus( "DisplayTenantTaxID") && 
+                                            !string.IsNullOrEmpty(Model.TaxId))
                                             {
                                                 <tr>
                                                     <td style="padding:0px;">
-                                                        <span> @Html.Raw(Model.GetDictionaryItem( "DisplayTenantTaxID"))</span>  <span>@Model.TaxId</span>
+                                                        <span> @Html.Raw(Model.GetDictionaryItem("DisplayTenantTaxID"))</span>  
+                                                        <span>@Model.TaxId</span>
                                                     </td>
                                                 </tr>
                                             }
@@ -1459,7 +1482,9 @@
                                         {
                                             lstClientLeaseNo.Add(item.ClientContractNo);
                                         }
+
                                         string strlstClientLeaseNo = string.Join(",", lstClientLeaseNo.ToArray());
+
                                         <tr>
                                             <td style="text-align:right;">
                                                 <span style="font-size:15px;font-family:arial;font-weight:bold;">Ihrer Referenz</span>
@@ -1598,30 +1623,41 @@
                     </td>
                 </tr>
 
+                //Model.GetDictionaryItem( "FontSizeCustomization")) 
+
                 @if (Model.GetDictionaryVisibleStatus( "DisplayLabelHeaderNameofthedocument"))
                 {
                     //added by prakash during credit note development time on sprint 22 on 19-11-2018.
                     // changes by shiva for client northern montana they want to sales invoice fontsize 11 px (14-03-2019)
                     var fontsize = "";
-                    if (Convert.ToString(loginclientId).ToUpper() == "5E824297-5808-4C04-8F4B-D82D043F6DD8" || Convert.ToString(loginclientId).ToUpper() == "34B0CD04-3D8C-48D2-91A8-D5740290A7DB" || Convert.ToString(loginclientId).ToUpper() == "67810EF0-6518-43E4-B9DF-5E28730321B8"
-                        || Convert.ToString(loginclientId).ToUpper() == "D738C95B-1AAF-4FA3-BB16-8ABD783C11BD" || Convert.ToString(loginclientId).ToUpper() == "CA3FE9ED-ED44-44BD-A11B-F6E7D77B7B88")
+
+                    if (Convert.ToString(loginclientId).ToUpper() == "5E824297-5808-4C04-8F4B-D82D043F6DD8" || 
+                    Convert.ToString(loginclientId).ToUpper() == "34B0CD04-3D8C-48D2-91A8-D5740290A7DB" || 
+                    Convert.ToString(loginclientId).ToUpper() == "67810EF0-6518-43E4-B9DF-5E28730321B8" || 
+                    Convert.ToString(loginclientId).ToUpper() == "D738C95B-1AAF-4FA3-BB16-8ABD783C11BD" || 
+                    Convert.ToString(loginclientId).ToUpper() == "CA3FE9ED-ED44-44BD-A11B-F6E7D77B7B88")
                     {
-                        fontsize = (Convert.ToString(loginclientId).ToUpper() == "5E824297-5808-4C04-8F4B-D82D043F6DD8" || Convert.ToString(loginclientId).ToUpper() == "34B0CD04-3D8C-48D2-91A8-D5740290A7DB" || Convert.ToString(loginclientId).ToUpper() == "67810EF0-6518-43E4-B9DF-5E28730321B8"
-                            || Convert.ToString(loginclientId).ToUpper() == "D738C95B-1AAF-4FA3-BB16-8ABD783C11BD" || Convert.ToString(loginclientId).ToUpper() == "CA3FE9ED-ED44-44BD-A11B-F6E7D77B7B88") ? "font-size:40px!important" : "font-size:25px!important";
+                        fontsize = "font-size:40px!important";
                     }
                     else
                     {
                         fontsize = "font-size:25px!important";
                     }
+
                     if (Model.InvoiceDetail.Category == "INVOICE-CREDITNOTE")
                     {
-                        var displayLabelHeaderNameoftheCreditNoteDocument = Model.GetDictionaryItem( "DisplayLabelCreditNotedocument");
-                        displayLabelHeaderNameoftheCreditNoteDocument = string.IsNullOrEmpty(displayLabelHeaderNameoftheCreditNoteDocument) ? "Credit Note" : displayLabelHeaderNameoftheCreditNoteDocument;
+                        var displayLabelHeaderNameoftheCreditNoteDocument = 
+                            Model.GetDictionaryItem( "DisplayLabelCreditNotedocument");
+                        
+                            displayLabelHeaderNameoftheCreditNoteDocument = 
+                                string.IsNullOrEmpty(displayLabelHeaderNameoftheCreditNoteDocument) ? 
+                                "Credit Note" : displayLabelHeaderNameoftheCreditNoteDocument;
 
                         if (!Model.GetDictionaryVisibleStatus( "DisplayLabelCreditNotedocument"))
                         {
                             displayLabelHeaderNameoftheCreditNoteDocument = "";
                         }
+
                         <tr>
                             <td colspan="3" style="padding-top:20px;">
                                 <span style="@fontsize;font-family:arial;">@Html.Raw(displayLabelHeaderNameoftheCreditNoteDocument)@*Credit Note INVOICE*@</span>
@@ -1640,7 +1676,9 @@
                                 {
                                     <span style="@fontsize;font-family:arial;">@Html.Raw(Model.GetDictionaryItem( "DisplayLabelHeaderNameofthedocument"))@*SALES INVOICE*@</span>
                                 }
-                                @if (Convert.ToString(loginclientId).ToUpper() == "67810EF0-6518-43E4-B9DF-5E28730321B8" || Convert.ToString(loginclientId).ToUpper() == "5700664A-16CA-435A-ABC4-190B5E5CFD10" || Convert.ToString(loginclientId).ToUpper() == "ED1C8BBD-C94E-4B68-A1E1-25580D343337")
+                                @if (Convert.ToString(loginclientId).ToUpper() == "67810EF0-6518-43E4-B9DF-5E28730321B8" || 
+                                Convert.ToString(loginclientId).ToUpper() == "5700664A-16CA-435A-ABC4-190B5E5CFD10" || 
+                                Convert.ToString(loginclientId).ToUpper() == "ED1C8BBD-C94E-4B68-A1E1-25580D343337")
                                 {
                                     <span style="font-size: 15px !important; font-family: arial;">за послуги оренди від @invoiceCreatedDate згідно договором оренди № @invoiceDetail.ContractId</span>
                                 }
@@ -1649,10 +1687,12 @@
                     }
 
                 }
+
                 @if (Model.LeaseInvoicePastDue == null)
                 {
                     Model.LeaseInvoicePastDue = new List<LeaseInvoicePastDue>();
                 }
+
                 @if (displayPastDueTop == true && Model.LeaseInvoicePastDue.Count() > 0)
                 {
                     if (Convert.ToString(loginclientId).ToUpper() == "67810EF0-6518-43E4-B9DF-5E28730321B8")
@@ -1663,6 +1703,7 @@
                             </td>
                         </tr>
                     }
+
                     <tr style="page-break-before:avoid;">
                         <td colspan="2">
                             <table style="page-break-before:avoid;">
@@ -1865,14 +1906,20 @@
                             <tbody>
                                 @if (newInvoiceModel != null)
                                 {
-
                                     List<long> lstContractIds = new List<long>();
+                                    
                                     foreach (var item in newInvoiceModel)
                                     {
                                         lstContractIds.Add(item.ContractID);
                                     }
+
                                     lstContractIds = lstContractIds.Distinct().ToList();
-                                    var invoiceItemDetail = newInvoiceModel.Where(x => x.Item != "Transferred").OrderByDescending(x => x.ContractID).ThenBy(xx => xx.OrderNo).ToList();
+                                    
+                                    var invoiceItemDetail = newInvoiceModel
+                                        .Where(x => x.Item != "Transferred")
+                                        .OrderByDescending(x => x.ContractID)
+                                        .ThenBy(xx => xx.OrderNo).ToList();
+                                    
                                     foreach (var objItem in invoiceItemDetail)
                                     {
                                         //For loop start
@@ -1880,18 +1927,21 @@
                                         if (IsEnabledMultipleTax && Model.InvoiceAppliedTaxDetails != null)
                                         {
                                             objItem.ItemId = objItem.ItemId ?? Guid.Empty;
-                                            invoiceItemTaxDet = Model.InvoiceAppliedTaxDetails.Where(xx => xx.ItemServiceId == objItem.ItemServiceId && xx.ContractId == objItem.ContractID).ToList();
 
+                                            invoiceItemTaxDet = Model.InvoiceAppliedTaxDetails
+                                            .Where(xx => xx.ItemServiceId == objItem.ItemServiceId && xx.ContractId == objItem.ContractID).ToList();
                                         }
+
                                         if (objItem.Item != "Insurance")
                                         {
                                             if (objItem.Price != 0)
                                             {
-
                                                 individualSubTotal = individualSubTotal + Convert.ToDecimal(objItem.Price);
                                                 individualTotal = DisplayTax == "1" ? (individualTotal + Convert.ToDecimal(objItem.totAmt)) : (individualTotal + Convert.ToDecimal(objItem.Price));
                                                 individualTaxTotal = individualTaxTotal + Convert.ToDecimal(objItem.Tax);
+                                                
                                                 var whitespacenowrap = (Convert.ToString(loginclientId).ToUpper() == "CA3FE9ED-ED44-44BD-A11B-F6E7D77B7B88") ? "white-space: nowrap" : "";
+                                                
                                                 <tr style="text-align:center; padding-top: 9px; padding-bottom: 9px; padding-left: 5px;@whitespacenowrap">
                                                     @{
                                                         var objectDescription = objItem.Description;
@@ -1910,6 +1960,7 @@
                                                             customObjectDescription = true;
 
                                                         }
+
                                                         //if (Convert.ToString(loginclientId).ToUpper() == "5E824297-5808-4C04-8F4B-D82D043F6DD8" || Convert.ToString(loginclientId).ToUpper() == "273470E5-2BB7-4667-907A-3E05B2A21867"
                                                         //                   || Convert.ToString(loginclientId).ToUpper() == "80BB9F0E-8706-435A-BE03-756E51AD9ADF" || loginclientId == new Guid("5462327C-DEDE-42C0-9EA5-E731C994A23E") || Convert.ToString(loginclientId).ToUpper() == "16D8E222-2133-45CD-AD72-A63EE0607B06" || Convert.ToString(loginclientId).ToUpper() == "A86CA415-7EBA-4E3F-B8C3-BBEC4720FBC5")
                                                         //{
@@ -1922,7 +1973,8 @@
                                                         //    }
                                                         //}
 
-                                                        if (Convert.ToString(loginclientId).ToUpper() == "1440AB2F-4FD9-4497-BBF2-B2A25CB0916F" || Convert.ToString(loginclientId).ToUpper() == "F796A71D-54ED-4CFD-99DC-ABDAE4A27CAB")
+                                                        if (Convert.ToString(loginclientId).ToUpper() == "1440AB2F-4FD9-4497-BBF2-B2A25CB0916F" || 
+                                                        Convert.ToString(loginclientId).ToUpper() == "F796A71D-54ED-4CFD-99DC-ABDAE4A27CAB")
                                                         {
                                                             if (DISPLAYUNITBASEDON == "SQFT")
                                                             {
@@ -1947,8 +1999,10 @@
                                                                 objectDescription = !string.IsNullOrEmpty(documentConfig.DepositText) ? documentConfig.DepositText : objItem.Description;
                                                             }
 
-                                                            if (Convert.ToString(loginclientId).ToUpper() == "F796A71D-54ED-4CFD-99DC-ABDAE4A27CAB" || Convert.ToString(loginclientId).ToUpper() == "273470E5-2BB7-4667-907A-3E05B2A21867"
-                                                                || Convert.ToString(loginclientId).ToUpper() == "80BB9F0E-8706-435A-BE03-756E51AD9ADF" || Convert.ToString(loginclientId).ToUpper() == "6DC585E9-8030-4A8F-B875-49031A8F7C96")
+                                                            if (Convert.ToString(loginclientId).ToUpper() == "F796A71D-54ED-4CFD-99DC-ABDAE4A27CAB" || 
+                                                            Convert.ToString(loginclientId).ToUpper() == "273470E5-2BB7-4667-907A-3E05B2A21867" || 
+                                                            Convert.ToString(loginclientId).ToUpper() == "80BB9F0E-8706-435A-BE03-756E51AD9ADF" || 
+                                                            Convert.ToString(loginclientId).ToUpper() == "6DC585E9-8030-4A8F-B875-49031A8F7C96")
                                                             {
                                                                 if (objectDescription.Contains("-"))
                                                                 {
@@ -1961,21 +2015,28 @@
                                                             }
 
                                                         }
-                                                        if (Convert.ToString(loginclientId).ToUpper() != "5E824297-5808-4C04-8F4B-D82D043F6DD8" && Convert.ToString(loginclientId).ToUpper() != "273470E5-2BB7-4667-907A-3E05B2A21867"
-                                                            && Convert.ToString(loginclientId).ToUpper() != "80BB9F0E-8706-435A-BE03-756E51AD9ADF" && Convert.ToString(loginclientId).ToUpper() != "6DC585E9-8030-4A8F-B875-49031A8F7C96")
+
+                                                        if (Convert.ToString(loginclientId).ToUpper() != "5E824297-5808-4C04-8F4B-D82D043F6DD8" && 
+                                                        Convert.ToString(loginclientId).ToUpper() != "273470E5-2BB7-4667-907A-3E05B2A21867" && 
+                                                        Convert.ToString(loginclientId).ToUpper() != "80BB9F0E-8706-435A-BE03-756E51AD9ADF" && 
+                                                        Convert.ToString(loginclientId).ToUpper() != "6DC585E9-8030-4A8F-B875-49031A8F7C96")
                                                         {
-                                                            objectDescription = Storagebase.Helper.JQueryUIDatePickerHelper.ReturnInvoicePDFDescription(DISPLAYUNITBASEDON, objItem, documentConfig, objectDescription);
+                                                            objectDescription = 
+                                                                InvoiceGenerationHelper.ReturnInvoicePDFDescription(
+                                                                DISPLAYUNITBASEDON ?? string.Empty, objItem, documentConfig, objectDescription);
 
                                                             if (objectDescription.ToUpper() == "DEPOSIT" || objectDescription == documentConfig.DepositText)
                                                             {
                                                                 objectDescription += "-" + Model.UnitNumber;
                                                             }
                                                         }
+
                                                         if (objItem.Item == "CREDITNOTE" || objItem.Item == "INVOICE-CREDITNOTE-PALLET")
                                                         {
                                                             var startDate = objItem.StartDate != null ? Convert.ToDateTime(objItem.StartDate).ToShortDateString() : "";
                                                             var endDate = objItem.EndDate != null ? Convert.ToDateTime(objItem.EndDate).ToShortDateString() : "";
                                                             objectDescription = Html.Raw(Model.GetDictionaryItem( "DisplayLabelHeaderInvoiceNumber")) + " - " + objItem.Description + "  ";
+                                                            
                                                             if (!string.IsNullOrEmpty(startDate))
                                                             {
                                                                 objectDescription = objectDescription + ",  " + startDate + " " + Model.GetDictionaryItem( "DisplayLabelHeaderBillingPeriodto") + " " + endDate;
@@ -1990,19 +2051,23 @@
                                                             objectDescription = locationName + " " + objectDescription;
                                                         }
                                                     }
+
                                                     @if (Convert.ToString(loginclientId).ToUpper() == "CA3FE9ED-ED44-44BD-A11B-F6E7D77B7B88")
                                                     {
                                                         objectDescription = objItem.Description;
                                                     }
+
                                                     @if (Convert.ToString(loginclientId).ToUpper() == "4D28184D-8942-42EE-984F-39ABEE023596")
                                                     {
                                                         objectDescription = objectDescription.Replace("Rental of Room", "Наем на помещение");
                                                         objectDescription = objectDescription.Replace("Square Meter", "кв.м.");
                                                     }
+
                                                     @if (Convert.ToString(loginclientId).ToLower() == "e6adc2f6-2e89-4139-8c6f-8ceb80efecbb")
                                                     {
                                                         objectDescription = objectDescription.Replace("Square Meter", "mq");
                                                     }
+
                                                     @if (Model.GetDictionaryVisibleStatus( "DisplayCurrentDueItem"))
                                                     {
                                                         <td style="text-align:left;padding-top:1px;padding-bottom:1px;">
@@ -2023,7 +2088,8 @@
                                                             }
                                                             else
                                                             {
-                                                                if (Convert.ToString(loginclientId).ToUpper() == "273470E5-2BB7-4667-907A-3E05B2A21867" || Convert.ToString(loginclientId).ToUpper() == "80BB9F0E-8706-435A-BE03-756E51AD9ADF")
+                                                                if (Convert.ToString(loginclientId).ToUpper() == "273470E5-2BB7-4667-907A-3E05B2A21867" || 
+                                                                Convert.ToString(loginclientId).ToUpper() == "80BB9F0E-8706-435A-BE03-756E51AD9ADF")
                                                                 {
                                                                     if (ObjItemdata == "Rent")
                                                                     {
@@ -2037,10 +2103,10 @@
                                                                 }
                                                                 else
                                                                 {
-
                                                                     if (ObjItemdata == "Rent" && objOverallConfigData.AccountSettingsTable4.IsActivateNewUI)
                                                                     {
                                                                         bool isHavingHyphen = objectDescription.Contains("-");
+
                                                                         if (loginclientId == new Guid("62CF7507-A82D-493F-818E-34C54861B5FA"))
                                                                         {
                                                                             int index = objectDescription.IndexOf(",");
@@ -2054,8 +2120,12 @@
                                                                             var rentalInfoArr = objectDescription.Split('-');
 
                                                                             Model.UnitInfo.Height = Model.UnitInfo.Height == 0 ? 1M : Model.UnitInfo.Height;
-                                                                            decimal areaValue = Convert.ToDecimal(Model.UnitInfo.Width) * Convert.ToDecimal(Model.UnitInfo.Depth);
-                                                                            decimal volumeValue = Convert.ToDecimal(Model.UnitInfo.Width) * Convert.ToDecimal(Model.UnitInfo.Depth * Model.UnitInfo.Height);
+                                                                            
+                                                                            decimal areaValue = Convert.ToDecimal(Model.UnitInfo.Width) * 
+                                                                                Convert.ToDecimal(Model.UnitInfo.Depth);
+                                                                            
+                                                                            decimal volumeValue = Convert.ToDecimal(Model.UnitInfo.Width) * 
+                                                                                Convert.ToDecimal(Model.UnitInfo.Depth * Model.UnitInfo.Height);
 
                                                                             if (sizeRoundUp)
                                                                             {
@@ -2065,25 +2135,37 @@
 
                                                                             if (Model.UnitStorageTypeInfo.DisplayAreaOrVolumeMeasurementFormat == "SIZE")
                                                                             {
-                                                                                objectDescription = rentalInfoArr[0] + "(" + Convert.ToDecimal(Model.UnitInfo.Width).ToString("N2") + " x " + Convert.ToDecimal(Model.UnitInfo.Depth).ToString("N2") + ") " + Model.UnitStorageTypeInfo.DisplayStorageTypeBasedOn_MetricSize.ToLower();
+                                                                                objectDescription = rentalInfoArr[0] + "(" + 
+                                                                                Convert.ToDecimal(Model.UnitInfo.Width).ToString("N2") + 
+                                                                                " x " + Convert.ToDecimal(Model.UnitInfo.Depth).ToString("N2") + 
+                                                                                ") " + Model.UnitStorageTypeInfo.DisplayStorageTypeBasedOn_MetricSize.ToLower();
                                                                             }
                                                                             else if (Model.UnitStorageTypeInfo.DisplayAreaOrVolumeMeasurementFormat == "QSIZE")
                                                                             {
-                                                                                objectDescription = rentalInfoArr[0] + " QSize (" + Convert.ToDecimal(Model.UnitInfo.Width).ToString("N2") + " x " + Convert.ToDecimal(Model.UnitInfo.Depth).ToString("N2") + " x " + Convert.ToDecimal(Model.UnitInfo.Height).ToString("N2") + ") " + Model.UnitStorageTypeInfo.DisplayStorageTypeBasedOn_MetricSize.ToLower();
+                                                                                objectDescription = rentalInfoArr[0] + " QSize (" + 
+                                                                                Convert.ToDecimal(Model.UnitInfo.Width).ToString("N2") + 
+                                                                                " x " + Convert.ToDecimal(Model.UnitInfo.Depth).ToString("N2") + 
+                                                                                " x " + Convert.ToDecimal(Model.UnitInfo.Height).ToString("N2") + 
+                                                                                ") " + Model.UnitStorageTypeInfo.DisplayStorageTypeBasedOn_MetricSize.ToLower();
                                                                             }
-                                                                            else if (Model.UnitStorageTypeInfo.DisplayAreaOrVolumeMeasurementFormat == "SQFT" || Model.UnitStorageTypeInfo.DisplayAreaOrVolumeMeasurementFormat == "M2"
-                                                                                || Model.UnitStorageTypeInfo.DisplayAreaOrVolumeMeasurementFormat == "SQCM")
+                                                                            else if (Model.UnitStorageTypeInfo.DisplayAreaOrVolumeMeasurementFormat == "SQFT" || 
+                                                                            Model.UnitStorageTypeInfo.DisplayAreaOrVolumeMeasurementFormat == "M2" || 
+                                                                            Model.UnitStorageTypeInfo.DisplayAreaOrVolumeMeasurementFormat == "SQCM")
                                                                             {
-                                                                                objectDescription = rentalInfoArr[0] + " " + areaValue.ToString("N2") + " " + Model.UnitStorageTypeInfo.DisplayAreaOrVolumeMeasurementFormat.ToLower();
+                                                                                objectDescription = rentalInfoArr[0] + " " + areaValue.ToString("N2") + 
+                                                                                " " + Model.UnitStorageTypeInfo.DisplayAreaOrVolumeMeasurementFormat.ToLower();
                                                                             }
-                                                                            else if (Model.UnitStorageTypeInfo.DisplayAreaOrVolumeMeasurementFormat == "QMT" || Model.UnitStorageTypeInfo.DisplayAreaOrVolumeMeasurementFormat == "QCM"
-                                                                                || Model.UnitStorageTypeInfo.DisplayAreaOrVolumeMeasurementFormat == "QFT")
+                                                                            else if (Model.UnitStorageTypeInfo.DisplayAreaOrVolumeMeasurementFormat == "QMT" || 
+                                                                            Model.UnitStorageTypeInfo.DisplayAreaOrVolumeMeasurementFormat == "QCM" || 
+                                                                            Model.UnitStorageTypeInfo.DisplayAreaOrVolumeMeasurementFormat == "QFT")
                                                                             {
-                                                                                objectDescription = rentalInfoArr[0] + " " + volumeValue.ToString("N2") + " " + Model.UnitStorageTypeInfo.DisplayAreaOrVolumeMeasurementFormat.ToLower();
+                                                                                objectDescription = rentalInfoArr[0] + " " + volumeValue.ToString("N2") + " " + 
+                                                                                Model.UnitStorageTypeInfo.DisplayAreaOrVolumeMeasurementFormat.ToLower();
                                                                             }
                                                                             else
                                                                             {
-                                                                                objectDescription = rentalInfoArr[0] + " " + volumeValue.ToString("N2") + " " + Model.UnitStorageTypeInfo.DisplayAreaOrVolumeMeasurementFormat.ToLower();
+                                                                                objectDescription = rentalInfoArr[0] + " " + volumeValue.ToString("N2") + " " + 
+                                                                                Model.UnitStorageTypeInfo.DisplayAreaOrVolumeMeasurementFormat.ToLower();
                                                                             }
                                                                         }
 
@@ -2103,7 +2185,9 @@
                                                     @if (Model.GetDictionaryVisibleStatus( "DisplayCurrentDueQuantity"))
                                                     {
                                                         //added by shiva for clientdocument ukrine client textalign right
-                                                        var textalign = (Convert.ToString(loginclientId).ToUpper() == "CA3FE9ED-ED44-44BD-A11B-F6E7D77B7B88" || isCblockersselfstorage) ? "text-align:right;" : "text-align:center;";
+                                                        var textalign = (Convert.ToString(loginclientId).ToUpper() == "CA3FE9ED-ED44-44BD-A11B-F6E7D77B7B88" || 
+                                                        isCblockersselfstorage) ? "text-align:right;" : "text-align:center;";
+                                                        
                                                         <td style="@textalign;padding-top:1px;padding-bottom:1px;">
                                                             @objItem.ItemQty
                                                         </td>
@@ -2123,7 +2207,9 @@
                                                             {
                                                                 for (var td = 0; td < multipleTaxHeaderCount; td++)
                                                                 {
-                                                                    var itemTaxdet = invoiceItemTaxDet != null ? invoiceItemTaxDet.FirstOrDefault(xx => xx.TaxMasterId == multipleTaxHeaderDet[td].Id) : null;
+                                                                    var itemTaxdet = invoiceItemTaxDet != null ? invoiceItemTaxDet.FirstOrDefault(xx => 
+                                                                        xx.TaxMasterId == multipleTaxHeaderDet[td].Id) : null;
+                                                                    
                                                                     if (itemTaxdet != null)
                                                                     {
                                                                         <td style="text-align:right;padding-top:1px;padding-bottom:1px;">
@@ -2226,6 +2312,7 @@
                                                 {
                                                     //added by shiva for clientdocument ukraine client textalign right
                                                     var textalign = (Convert.ToString(loginclientId).ToUpper() == "CA3FE9ED-ED44-44BD-A11B-F6E7D77B7B88" || isCblockersselfstorage) ? "text-align:right;" : "text-align:center;";
+                                                    
                                                     <td style="@textalign;padding-top:1px;padding-bottom:1px;">
                                                         @objItem.ItemQty
                                                     </td>
@@ -2411,7 +2498,10 @@
                                                         {
                                                             for (var td = 0; td < multipleTaxHeaderCount; td++)
                                                             {
-                                                                var itemTaxdet = multipleTaxHeaderDet != null ? invoiceItemTaxDet.FirstOrDefault(xx => xx.TaxMasterId == multipleTaxHeaderDet[td].Id) : null;
+                                                                var itemTaxdet = multipleTaxHeaderDet != null ? 
+                                                                    invoiceItemTaxDet.FirstOrDefault(xx => 
+                                                                    xx.TaxMasterId == multipleTaxHeaderDet[td].Id) : null;
+                                                                
                                                                 if (itemTaxdet != null)
                                                                 {
                                                                     <td style="text-align:right;padding-top:1px;padding-bottom:1px;">
@@ -2432,9 +2522,8 @@
                                                                 -@Convert.ToDecimal(objItem.DiscountTax).ToString("c")
                                                             </td>
                                                         }
-
-
                                                     }
+
                                                     if (Model.GetDictionaryVisibleStatus( "DisplayCurrentDueGrossCost"))
                                                     {
                                                         <td style="text-align:right;padding-top:1px;padding-bottom:1px;padding-right:6px;">
@@ -2454,18 +2543,22 @@
                                             </tr>
                                         }
                                     }
-                                    var transferItemDetail = newInvoiceModel.Where(x => x.Item == "Transferred").ToList();
+                                    
+                                    var transferItemDetail = 
+                                        newInvoiceModel.Where(x => x.Item == "Transferred").ToList();
+                                    
                                     if (transferItemDetail != null)
                                     {
-
-                                        transferredFromUnitNumber = (Model.TransferTenantUnitDetail != null ? Model.TransferTenantUnitDetail.TranferFromUnitNumber : "");
+                                        transferredFromUnitNumber = 
+                                        (Model.TransferTenantUnitDetail != null ? 
+                                        Model.TransferTenantUnitDetail.TranferFromUnitNumber : "");
 
                                         if (transferItemDetail.Any())
                                         {
-
                                             var colSpan = 5;
                                             colSpan = DisplayTax == "1" ? 5 : 3;
                                             colSpan = colSpan + multipleTaxHeaderCount;
+
                                             <tr>
                                                 <td colspan="@colSpan" style="text-align:right;padding-top:1px;padding-bottom:1px;border-bottom:1px solid #ddd;border-collapse:collapse;line-height:1.5;"></td>
                                             </tr>
@@ -2475,6 +2568,7 @@
                                                 {
                                                     <td style="text-align:left;padding-top:1px;padding-bottom:1px;"></td>
                                                 }
+
                                                 @if (Model.GetDictionaryVisibleStatus( "DisplayCurrentDueQuantity"))
                                                 {
                                                     if (DisplayTax == "0")
@@ -2485,14 +2579,15 @@
                                                     {
                                                         <td style="text-align:right;padding-top:5px;padding-bottom:9px;"></td>
                                                     }
-
                                                 }
+
                                                 @if (DisplayTax == "1" && !isCblockersselfstorage)
                                                 {
                                                     if (Model.GetDictionaryVisibleStatus( "DisplayCurrentDueNetCost"))
                                                     {
                                                         <td style="text-align:right;padding-top:1px;padding-bottom:1px;"></td>
                                                     }
+
                                                     if (Model.GetDictionaryVisibleStatus( "DisplayCurrentDueTaxPercent"))
                                                     {
                                                         if (IsEnabledMultipleTax && multipleTaxHeaderDet != null && multipleTaxHeaderCount > 0)
@@ -2514,9 +2609,8 @@
                                                         {
                                                             <td style="font-size:10px;font-family:arial;text-align:right;font-weight:bold;padding-left:70px;padding-top:8px;white-space:nowrap;padding-bottom:8px;">Total</td>
                                                         }
-
-
                                                     }
+
                                                     if (Model.GetDictionaryVisibleStatus( "DisplayCurrentDueGrossCost"))
                                                     {
                                                         <td style="font-size:10px;font-family:arial;font-weight:bold;text-align:right;white-space:nowrap;">@Convert.ToDecimal(individualTotal).ToString("c")</td>
@@ -2550,7 +2644,6 @@
                                                 </td>
                                             </tr>
 
-
                                             totalTranferedAmt = 0;
                                             var recordCount = transferItemDetail.Count();
                                             transferItemDetail = transferItemDetail.OrderBy(x => x.OrderNo).ToList();
@@ -2559,6 +2652,7 @@
                                                 isTrasferred = true;
                                                 var objItem = transferItemDetail[index];
                                                 var invoiceItemTaxDet = new List<InvoiceAppliedTaxDetail>();
+
                                                 if (IsEnabledMultipleTax && Model.InvoiceAppliedTaxDetails != null)
                                                 {
                                                     objItem.ItemId = objItem.ItemId ?? Guid.Empty;
@@ -2579,6 +2673,7 @@
                                                         }
                                                     }
                                                 }
+
                                                 if (objItem.Price != 0 || (objItem.SubCategory == "appliedcredit" && objItem.totAmt < 0 && objItem.Price == 0))
                                                 {
                                                     // Prakash added this  code on 28-05-2019. regardig multiple tax full invoice
@@ -2592,6 +2687,7 @@
                                                             objItem.Price = Convert.ToDecimal(objItem.Price) + Convert.ToDecimal(objItem.Tax);
                                                         }
                                                     }
+
                                                     individualSubTotal = individualSubTotal + Convert.ToDecimal(objItem.Price);
                                                     individualTotal = DisplayTax == "1" ? (individualTotal + Convert.ToDecimal(objItem.totAmt)) : (individualTotal + Convert.ToDecimal(objItem.Price));
                                                     individualTaxTotal = individualTaxTotal + Convert.ToDecimal(objItem.Tax);
@@ -2879,11 +2975,17 @@
             var InvoiceTotal = individualTotal;
             var invoiceRoundOffAmount = Model.InvoiceDetail.RoundOffValue;
             var IndividualTaxTotal = individualTaxTotal;
+            
             if (Model.InvoiceDetail.Advance != null)
             {
-                Model.InvoiceDetail.TotalInvAmt = Model.InvoiceDetail.TotalInvAmt + Convert.ToDecimal(Model.InvoiceDetail.Advance);
+                Model.InvoiceDetail.TotalInvAmt = Model.InvoiceDetail.TotalInvAmt + 
+                    Convert.ToDecimal(Model.InvoiceDetail.Advance);
             }
-            Model.InvoiceDetail.TotalInvAmt = Model.IsCreditNoteInvoice ? (-1) * Model.InvoiceDetail.AppliedCreditAmount : Model.InvoiceDetail.TotalInvAmt;
+            
+            Model.InvoiceDetail.TotalInvAmt = 
+                Model.IsCreditNoteInvoice ? (-1) * Model.InvoiceDetail.AppliedCreditAmount : 
+                Model.InvoiceDetail.TotalInvAmt;
+            
             // code changed by prakash , after invoice generation I have enabled round off functionality then I'm regenerating invoice pdf by making pdf path null then in this code will should with rounded off value
             // that is reason I have commentted this Storagebase.Helper.JQueryUIDatePickerHelper.GetRoundingoffValue(Convert.ToDecimal(Model.InvoiceDetail.TotalInvAmt)) method.
             var roundingoffValueCurrentInvoice = Convert.ToDecimal(Model.InvoiceDetail.TotalInvAmt);  ///Storagebase.Helper.JQueryUIDatePickerHelper.GetRoundingoffValue(Convert.ToDecimal(Model.InvoiceDetail.TotalInvAmt));// Prakash
@@ -2892,7 +2994,6 @@
             var balanceafterTranferred = Convert.ToDecimal(individualTotal);
             string multipleTaxSummaryText = String.Empty;
 
-
             //changes by shiva for client document store and park they want to space in round of values
             var invoiceTotalSpace = (Convert.ToString(loginclientId).ToUpper() == "34B0CD04-3D8C-48D2-91A8-D5740290A7DB"
                || Convert.ToString(loginclientId).ToUpper() == "67810EF0-6518-43E4-B9DF-5E28730321B8"
@@ -2900,7 +3001,9 @@
                || Convert.ToString(loginclientId).ToUpper() == "F796A71D-54ED-4CFD-99DC-ABDAE4A27CAB"
                || Convert.ToString(loginclientId).ToUpper() == "CA3FE9ED-ED44-44BD-A11B-F6E7D77B7B88"
                || Convert.ToString(loginclientId).ToUpper() == "02C3394D-1C07-445C-A1EA-EF49773D88BA"
-               || Convert.ToString(loginclientId).ToUpper() == "1440AB2F-4FD9-4497-BBF2-B2A25CB0916F") ? "margin-top:8px;margin-bottom:8px" : "";
+               || Convert.ToString(loginclientId).ToUpper() == "1440AB2F-4FD9-4497-BBF2-B2A25CB0916F") ? 
+               "margin-top:8px;margin-bottom:8px" : "";
+            
             //added by shiva for clientdocument M and z storage want to space in note term conditions
             var summaryNotespace = (Convert.ToString(loginclientId).ToUpper() == "5E824297-5808-4C04-8F4B-D82D043F6DD8"
                || Convert.ToString(loginclientId).ToUpper() == "D738C95B-1AAF-4FA3-BB16-8ABD783C11BD"
@@ -2909,9 +3012,10 @@
                || Convert.ToString(loginclientId).ToUpper() == "F796A71D-54ED-4CFD-99DC-ABDAE4A27CAB"
                || Convert.ToString(loginclientId).ToUpper() == "CA3FE9ED-ED44-44BD-A11B-F6E7D77B7B88"
                || Convert.ToString(loginclientId).ToUpper() == "02C3394D-1C07-445C-A1EA-EF49773D88BA"
-               || Convert.ToString(loginclientId).ToUpper() == "1440AB2F-4FD9-4497-BBF2-B2A25CB0916F") ? "padding-top:15px;padding-bottom:17px" : "";
-
+               || Convert.ToString(loginclientId).ToUpper() == "1440AB2F-4FD9-4497-BBF2-B2A25CB0916F") ? 
+               "padding-top:15px;padding-bottom:17px" : "";
         }
+
         @*code for displaying total transferred amount*@
         @if (isTrasferred && Model.GetDictionaryVisibleStatus( "DisplayTranferAmount"))
         {
@@ -2930,6 +3034,7 @@
                         </table>
                     </td>
                 </tr>
+
                 if (isCblockersselfstorage)
                 {
                     <tr>
@@ -2967,11 +3072,9 @@
                         </td>
                     </tr>
                 }
-
             }
-
-
         }
+
         @if (Model.GetDictionaryVisibleStatus( "DisplayTermsConditions"))
         {
             //added by shiva for clientdocument M and z storage want to space in note term conditions
@@ -3031,6 +3134,7 @@
                             </table>
                         </td>
                     </tr>
+
                     //added by shiva for total tax displaying
                     if (Model.GetDictionaryVisibleStatus( "SlmInv_TotalTax"))
                     {
@@ -3054,6 +3158,7 @@
                         </tr>
                     }
                 }
+
                 <tr>
                     <td colspan="2" style="width:100%;"></td>
                     <td colspan="6">
@@ -3068,9 +3173,8 @@
                         </table>
                     </td>
                 </tr>
-
-
             }
+
             if (isCblockersselfstorage)
             {
                 <tr>
@@ -3107,6 +3211,7 @@
                         </table>
                     </td>
                 </tr>
+
                 if (EnableInvoiceRoundoffValue == "1" && invoiceRoundOffAmount != 0)
                 {
                     <tr>
@@ -3125,6 +3230,7 @@
                     </tr>
                 }
             }
+
             //end Prakash added this code for display Rounded off value  on 07-11-2018. Sprint 22 End
             if (!IsEnabledMultipleTax || (EnableInvoiceRoundoffValue == "1" && invoiceRoundOffAmount != 0))
             {
@@ -3150,7 +3256,6 @@
 
         @if (Model.GetDictionaryVisibleStatus( "DisplayAdjustedThruAdvance") && isTrasferred == false)
         {
-
             if (adjustamount > 0)
             {
                 <tr>
@@ -3196,7 +3301,6 @@
 
         }
 
-
         @if (Model.GetDictionaryVisibleStatus( "DisplayPaymentDueon"))
         {
             <tr>
@@ -3222,8 +3326,14 @@
         @if (Model.LeaseInvoicePastDue.Count() > 0)
         {
             //added by shiva for client document komora they want to past due balance want border
-            var tblborder = (Convert.ToString(loginclientId).ToUpper() == "67810EF0-6518-43E4-B9DF-5E28730321B8" || Convert.ToString(loginclientId).ToUpper() == "CA3FE9ED-ED44-44BD-A11B-F6E7D77B7B88") ? "border=1" : "border=0";
-            var tblbordercolor = (Convert.ToString(loginclientId).ToUpper() == "67810EF0-6518-43E4-B9DF-5E28730321B8" || Convert.ToString(loginclientId).ToUpper() == "CA3FE9ED-ED44-44BD-A11B-F6E7D77B7B88") ? "border: 1px solid #000 !important" : "border: 1px solid #ddd !important";
+            var tblborder = (Convert.ToString(loginclientId).ToUpper() == "67810EF0-6518-43E4-B9DF-5E28730321B8" || 
+            Convert.ToString(loginclientId).ToUpper() == "CA3FE9ED-ED44-44BD-A11B-F6E7D77B7B88") ? 
+            "border=1" : "border=0";
+            
+            var tblbordercolor = (Convert.ToString(loginclientId).ToUpper() == "67810EF0-6518-43E4-B9DF-5E28730321B8" || 
+            Convert.ToString(loginclientId).ToUpper() == "CA3FE9ED-ED44-44BD-A11B-F6E7D77B7B88") ? 
+            "border: 1px solid #000 !important" : "border: 1px solid #ddd !important";
+            
             <table id="tblPastDueTable" style="width: 100%;@tblbordercolor; margin-bottom: 10px;border-collapse: collapse; page-break-inside: auto;" @tblborder>
                 @if (displayPastDueTop == false)
                 {
@@ -3267,6 +3377,7 @@
                             </th>
                         }
                     </tr>
+
                     foreach (var item in Model.LeaseInvoicePastDue)
                     {
                         <tr style="page-break-before:auto;page-break-after:auto;">
@@ -3317,7 +3428,6 @@
                                 </td>
                             }
                         </tr>
-
                     }
 
                     if (Model.GetDictionaryVisibleStatus( "DisplayPastDueBalanceAmount"))
@@ -3341,7 +3451,6 @@
             </table>
         }
         @{
-
             decimal TotalValue = 0;
             if (adjustamount > 0)
             {
@@ -3382,7 +3491,6 @@
                                         @Html.Raw(Model.GetDictionaryItem( "DisplayPastDueTotalamountDue"))@*Total due*@
                                     </td>
                                     <td style="font-size:10px;font-family:arial;font-weight:bold;text-align:right;white-space:nowrap;border:1px solid #ddd;border-left:1px solid #fff;width: 15%;">@Convert.ToDecimal(TotalValue).ToString("c")</td>
-
                                 </tr>
                             </tbody>
                         </table>
@@ -3563,15 +3671,17 @@
             </td>
 
             @{
-                var objcontract = new Contracts();
-                var paymentdisplaytext = objcontract.GetClientPaymentDisplayText();
-                var StandingOrder = "StandingOrder";
-                var OnlineBanking = "OnlineBanking";
-                var MoneyOrder = "MoneyOrder";
-                var CreditOrDebitCardTerminal = "CreditOrDebitCardTerminal";
-                var CreditCard = "CreditCard";
-                var Check = "Check";
-                var Cash = "Cash";
+                // var objcontract = new Contracts();
+                // var paymentdisplaytext = objcontract.GetClientPaymentDisplayText();
+
+                List<ClientPaymentMode> paymentdisplaytext = Model.PaymentDisplayText;
+                string StandingOrder = "StandingOrder";
+                string OnlineBanking = "OnlineBanking";
+                string MoneyOrder = "MoneyOrder";
+                string CreditOrDebitCardTerminal = "CreditOrDebitCardTerminal";
+                string CreditCard = "CreditCard";
+                string Check = "Check";
+                string Cash = "Cash";
 
                 bool SI_IsDisplayBankInfo = Model.GetDictionaryVisibleStatus( "SI_IsDisplayBankInfo");
                 bool SI_DisplayBankInfoForStandingOrder = Model.GetDictionaryVisibleStatus( "SI_DisplayBankInfoForStandingOrder");
@@ -3581,6 +3691,7 @@
                 bool SI_DisplayBankInfoForCreditCard = Model.GetDictionaryVisibleStatus( "SI_DisplayBankInfoForCreditCard");
                 bool SI_DisplayBankInfoForCheck = Model.GetDictionaryVisibleStatus( "SI_DisplayBankInfoForCheck");
                 bool SI_DisplayBankInfoForCash = Model.GetDictionaryVisibleStatus( "SI_DisplayBankInfoForCash");
+                
                 if (DisplayBankDetails == "1")
                 {
                     if (SI_IsDisplayBankInfo)
@@ -3588,7 +3699,6 @@
                         string paymentType = Model.Paymenttype.Trim().Replace(" ", "");
                         foreach (var item in paymentdisplaytext)
                         {
-
                             if (item.ValueText == paymentType)
                             {
                                 paymentType = item.DisplayText.Trim().Replace(" ", "");
@@ -3623,8 +3733,6 @@
                             }
                         }
 
-
-
                         if ((SI_DisplayBankInfoForStandingOrder && paymentType.ToUpper() == StandingOrder.ToUpper()) ||
                                   (SI_DisplayBankInfoForOnlineBanking && paymentType.ToUpper() == OnlineBanking.ToUpper()) ||
                                   (SI_DisplayBankInfoForMoneyOrder && paymentType.ToUpper() == MoneyOrder.ToUpper()) ||
@@ -3645,16 +3753,17 @@
                         displayType = "table-cell";
                     }
                 }
+
                 if (Convert.ToString(loginclientId).ToUpper() == "5ABB6129-BABB-401B-A1EB-29B70575D9F4")    //Need to display Bank Details in all the scenarios
                 {
                     displayType = "table-cell";
 
                 }
             }
+
             @*added by shiva for clientdocument komora they want to 2 bank address*@
             @if (Convert.ToString(loginclientId).ToUpper() == "67810EF0-6518-43E4-B9DF-5E28730321B8")
             {
-
                 <td style="vertical-align:top;padding-left:30px;display:@displayType;">
                     <table class="gridspan4 acgridspan4" style="white-space:nowrap;">
                         <tbody>
@@ -3704,11 +3813,9 @@
                         </tbody>
                     </table>
                 </td>
-
             }
             else if (Convert.ToString(loginclientId).ToLower() == "ed1c8bbd-c94e-4b68-a1e1-25580d343337")
             {
-
                 <td style="vertical-align:top;padding-left:30px;display:@displayType;">
                     <table class="gridspan4 acgridspan4" style="white-space:nowrap;">
                         <tbody>
@@ -3768,7 +3875,6 @@
             @*added by prasanth for clientdocument cblockers they want to 2 bank address*@
             else if (Convert.ToString(loginclientId).ToUpper() == "273470E5-2BB7-4667-907A-3E05B2A21867")
             {
-
                 <td style="vertical-align:top;padding-left:30px;display:@displayType;">
                     <table class="gridspan4 acgridspan4">
                         <tbody>
@@ -3831,9 +3937,9 @@
                         </tbody>
                     </table>
                 </td>
-
             }
-            else if ((Convert.ToString(loginclientId).ToUpper() == "C1B82609-8EA0-4C31-BB94-F6B8332749A6") && appEnvironment == "LIVE")
+            else if ((Convert.ToString(loginclientId).ToUpper() == "C1B82609-8EA0-4C31-BB94-F6B8332749A6") && 
+            appEnvironment == "LIVE")
             {
                 <td style="vertical-align:top; padding-left:50px;display:none;">
 
@@ -3843,40 +3949,31 @@
                                 <th style="text-decoration:underline;text-align:left !important;font-family:arial;font-size:9px;padding-bottom:8px;" id="BankdetailsTd">
                                     800 Storage & Movers
                                 </th>
-
                             </tr>
                             <tr>
-
                                 <td style="font-size:9px;font-family:Arial;font-weight:normal;text-align:left;">
                                     Bank Name :
-
                                 </td>
                                 <td style="font-size:9px;font-family:arial;font-weight:normal;">
                                     Abu Dhabi Commercial Bank
                                 </td>
-
                             </tr>
                             <tr>
-
                                 <td style="font-size:9px;font-family:arial;font-weight:normal;text-align:left;">
                                     Account Name :
                                 </td>
                                 <td style="font-size:9px;font-family:arial;font-weight:normal;">
                                     ABDULAZIZ SELF STORAGE SVCS COM LLC
                                 </td>
-
                             </tr>
                             <tr>
-
                                 <td style="font-size:9px;font-family:arial;font-weight:normal;text-align:left;">
                                     Branch Name :
                                 </td>
                                 <td style="font-size:9px;font-family:arial;font-weight:normal;">
                                     Dubai Mall
                                 </td>
-
                             </tr>
-
 
                             <tr>
                                 <td style="font-size:9px;font-family:arial;font-weight:normal;text-align:left;">
@@ -3886,8 +3983,6 @@
                                     ADCBAEAAXXX
                                 </td>
                             </tr>
-
-
 
                             <tr>
                                 <td style="font-size:9px;font-family:arial;font-weight:normal;text-align:left;">
@@ -4073,7 +4168,9 @@
                             @{
                                 var displayswift = "none";
                                 var displayiban = "none";
-                                if (documentConfig.InvoiceSwiftOrBIC == null || documentConfig.InvoiceSwiftOrBIC == "" && documentConfig.InvoiceIBAN == null || documentConfig.InvoiceIBAN == "")
+
+                                if (string.IsNullOrWhiteSpace(documentConfig.InvoiceSwiftOrBIC) &&
+                                string.IsNullOrWhiteSpace(documentConfig.InvoiceIBAN))
                                 {
                                     displayswift = "none";
                                     displayiban = "none";
@@ -4621,8 +4718,10 @@
 
                 if (strReferenceFormat.Contains("@reference_invoice_number"))
                 {
-                    string strCleanInvoiceId = System.Text.RegularExpressions.Regex.Replace(Model.InvoiceNo, "[^0-9]", "");
-                    int iCleanInvoiceId = 0;
+                    string strCleanInvoiceId = 
+                        System.Text.RegularExpressions.Regex.Replace(Model.InvoiceDetail.ClientInvoiceNumber, "[^0-9]", "");
+                    
+                        int iCleanInvoiceId = 0;
                     int.TryParse(strCleanInvoiceId.Trim(), out iCleanInvoiceId);
                     // Tries to parse the int, returns false on failure.
 
@@ -4643,6 +4742,7 @@
                 double ref_product_sum = 0;
                 int ref_stem = 1;
                 double tmp = 0;
+
                 for (int i = strReferenceFormatNumber.ToString().Length - 1; i >= 0; i--)
                 {
                     if (ref_stem > 3)
@@ -4667,23 +4767,30 @@
                         double.TryParse(strReferenceFormatNumber.ToString()[i].ToString(), out tmp);
                         ref_product_sum += tmp * 1;
                     }
+
                     ref_stem++;
                 }
+
                 double ref_reminder = ref_product_sum % 10;
                 double ref_product_sum_div = ref_product_sum;
+                
                 if (ref_reminder < 5)
                 {
                     ref_product_sum_div = ref_product_sum_div + 5;
                 }
+                
                 double ref_product_sum_ten = Math.Round(ref_product_sum_div / 10, 0, MidpointRounding.AwayFromZero) * 10;
                 ref_product_sum = ref_product_sum_ten - ref_product_sum;
+                
                 if (ref_product_sum == 10)
                 {
                     ref_product_sum = 0;
                 }
+
                 strReferenceFormat = strReferenceFormat + ref_product_sum.ToString();
                 strReferenceFormat = strReferenceFormat.PadLeft(20, '0');
                 int iReferenceMacrosCount2 = 0;
+
                 for (int i = 0; i < strReferenceArrays.Length; i++)
                 {
                     if (strReferenceArrays[i].ToLower().StartsWith("reference"))
