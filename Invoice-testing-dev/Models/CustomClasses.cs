@@ -19,6 +19,210 @@ public partial class ClientOverallConfig
     // public List<LanguagesDetails> LanguagesDetails { get; set; }
 }
 
+public class TransferTenantUnitDetail
+{
+    public long TransferFromContractId { get; set; }
+    public long TransferToContractId { get; set; }
+    public string TranferFromUnitNumber { get; set; }
+    public string TransferToUnitNumber { get; set; }
+    public Guid TransferFromUnitGuid { get; set; }
+    public Guid TransferToUnitGuid { get; set; }
+    public decimal TransferredInvoiceDue { get; set; }
+    public decimal TransferAppliedCredit { get; set; }
+    public decimal TransferRefundDue { get; set; }
+}
+
+public partial class UnitDetails
+{
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2214:DoNotCallOverridableMethodsInConstructors")]
+    public UnitDetails()
+    {
+    }
+
+    public Guid id { get; set; }
+
+    public string UnitNumber { get; set; }
+
+    public decimal Unitprice { get; set; }
+
+    public decimal? Width { get; set; }
+
+    public decimal? Depth { get; set; }
+
+    public decimal? Height { get; set; }
+
+    public string UnitSize { get; set; }
+    public string UnitCubicSize { get; set; }
+}
+
+public partial class TaxMaster
+{
+    public Guid Id { get; set; }
+
+    public Guid ClientId { get; set; }
+
+    public string Category { get; set; }
+
+    public decimal Tax1 { get; set; }
+
+    public decimal? Tax2 { get; set; }
+
+    public decimal? Tax3 { get; set; }
+
+    public DateTime? EffectiveFrom { get; set; }
+
+    public DateTime? EffectiveTo { get; set; }
+
+    public DateTime CreatedOn { get; set; }
+
+    public DateTime UpdatedOn { get; set; }
+
+    public bool Deleted { get; set; }
+
+    public bool IsActive { get; set; }
+    public Guid locationId { get; set; }
+
+    //Added TaxName and IsDefault parameters for Multiple tax implementation
+    public string TaxName { get; set; }
+    public bool IsDefault { get; set; }
+    // public virtual Location Location { get; set; } // by prakash on 12-02-2018.
+    //public virtual CaddyClientDetail CaddyClientDetail { get; set; }
+}
+
+public class NewInvoicePDFModel
+{
+    public Guid? Id { get; set; }
+    public Guid? ItemId { get; set; }
+    public Guid? ItemServiceId { get; set; }
+    public string Item { get; set; }
+    public string SubCategory { get; set; }
+    public string Description { get; set; }
+    public decimal? Price { get; set; }
+    public decimal? Tax { get; set; }
+    public decimal? Discount { get; set; }
+    public decimal? DiscountTax { get; set; }
+    public int ItemQty { get; set; }
+    public decimal? totAmt { get; set; }
+    public DateTime? StartDate { get; set; }
+    public DateTime? EndDate { get; set; }
+    public int OrderNo { get; set; }//This we are using for Display in Invoice PDF Rent,Insurance,Merchandise and Services like this.
+    public bool isThirdParty { get; set; }
+    public string DescriptionInches { get; set; }
+    public long ContractID { get; set; }
+    public string DescriptionSquareMeter { get; set; }
+    public string DescriptionCubicSize { get; set; }
+    public string DescriptionCubicMeter { get; set; }
+    public string DescriptionCubicFeet { get; set; }
+    public bool callingForReceiptPdf { get; set; }
+    public Guid? ItemMasterId { get; set; }
+}
+
+public partial class ContractDetails
+{
+    public ContractDetails()
+    {
+    }
+
+    public long Id { get; set; }
+
+    public Guid ContractGuid { get; set; }
+    public string ClientContractNo { get; set; }
+}
+
+public partial class ContractBankDetails
+{
+    public ContractBankDetails()
+    {
+        this.CreatedDate = DateTime.Now;
+        this.ModifiedDate = DateTime.Now;
+        this.IsDeleted = false;
+        this.Id = Guid.NewGuid();
+    }
+
+    public Guid Id { get; set; }
+
+    public long ContractId { get; set; }
+
+    public string BankName { get; set; }
+
+    public string NameOnAccount { get; set; }
+
+    public string AccountNo { get; set; }
+
+    public string SortCode { get; set; }
+
+    public bool IsDeleted { get; set; }
+
+    public DateTime CreatedDate { get; set; }
+
+    public DateTime ModifiedDate { get; set; }
+
+    public string BankAddress { get; set; }
+
+    public virtual ContractDetails ContractDetails { get; set; }
+}
+
+public class LeaseInvoicePastDue
+{
+    public string UnitNumber { get; set; }
+    public long contractid { get; set; }
+    public DateTime? InvoiceFromDate { get; set; }
+    public DateTime? InvoiceToDate { get; set; }
+    public DateTime? InvoiceDueDate { get; set; }
+    public decimal? Balance { get; set; }
+    public decimal? LatefeebyBalance { get; set; }
+}
+
+public partial class ContractInsurance
+{
+    public Guid ID { get; set; }
+
+    public long ContractID { get; set; }
+
+    public Guid InsPremiumId { get; set; }
+
+    public string PolicyNumber { get; set; }
+
+    public decimal InsuranceAmount { get; set; }
+
+    public DateTime EffectiveFrom { get; set; }
+
+    public DateTime EffectiveTo { get; set; }
+
+    public DateTime RenewalDate { get; set; }
+
+    public bool IsExpired { get; set; }
+
+    public DateTime CreatedDate { get; set; }
+
+    public DateTime UpdatedDate { get; set; }
+
+    public bool Isdeleted { get; set; }
+
+    public decimal Premium { get; set; }
+
+    public string ModificationHistory { get; set; }
+
+    public Guid? guidPayments { get; set; }
+    /// <summary>
+    /// IPTPercentage column sum of applied tax percentage
+    /// Comments added by prakash during sprint 30 on 19-04-2019.
+    /// refer invoice applied tax percentage table sum of invoiceitemcategory=='INSURANCE'
+    /// </summary>
+    public decimal? IPTPercentage { get; set; }
+
+    public decimal? IPTAmount { get; set; }
+
+    public Guid? InvoiceId { get; set; }
+
+    //public virtual ContractDetails ContractDetails { get; set; }
+
+    //public virtual InsurancePremiumMaster InsurancePremiumMaster { get; set; }
+
+    public bool IsThirdParty { get; set; }
+    //  public System.Guid InsCompanyID { get; set; }
+    public bool IsInsuranceStopped { get; set; }
+}
 public class InvoiceAppliedTaxDetail
 {
     public InvoiceAppliedTaxDetail()
