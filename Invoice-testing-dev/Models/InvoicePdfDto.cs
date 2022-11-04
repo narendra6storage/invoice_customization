@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Invoice_testing_dev.Models;
 
 namespace SixStorage.AutoInvoice.WebApi.Shared.DTOs.AutoInvoice;
 
@@ -15,24 +17,22 @@ public class InvoicePdfDto
         RemitPaymentTo = new PersonalDetails();
         PastDueList = new List<PastDueDetails>();
         InvoiceItemList = new List<InvoiceItemDetails>();
+        LanguageCustomizationList = new List<InvoiceLanguageCustomization>();
+        DocumentConfig = new ClientAppAndDocumentConfig();
+        clientPaymentMode = new List<ClientPaymentMode>();
+        InvoiceDetail = new ContractInvoiceDetails();
+        UnitInfo = new UnitDetails();
+        TransferTenantUnitDetail = new TransferTenantUnitDetail();
+        PaymentDisplayText = new List<ClientPaymentMode>();
     }
 
-    public string DateFormat
-    {
-        get
-        {
-            return "MM/dd/yyyy";
-        }
-    }
-
-    public string CurrentDateStr
-    {
-        get
-        {
-            return DateTime.Today.ToString(DateFormat);
-        }
-    }
-
+    public bool IsCreditNoteInvoice { get; set; }
+    public string TaxId { get; set; }
+    public string ClientInvoiceNumber { get; set; }
+    public bool? IsBussinessUser { get; set; }
+    public bool RoundOffEnabled { get; set; }
+    public decimal InvTaxPercentage { get; set; }
+    public bool DisplayTax { get; set; }//objOverallConfigData.clientApplicationmenuconfig.DisplayTax
     public bool IsMergedInvoice { get; set; }
     public Guid InvoiceIdGuid { get; set; }
     public long InvoiceIdNum { get; set; }
@@ -43,6 +43,7 @@ public class InvoicePdfDto
     public long ContractId { get; set; }
     public string? ClientLogoPath { get; set; }
     public DateTime InvoiceDate { get; set; }
+    public Location UnitLocationInfo { get; set; }
     public string InvoiceDateStr
     {
         get
@@ -50,10 +51,27 @@ public class InvoicePdfDto
             return InvoiceDate.ToString(DateFormat);
         }
     }
+    public string Paymenttype { get; set; }
     public string? BillingCycle { get; set; }
+    public bool IsEnabledMultipleTax { get; set; }
     public string? BillingCycleType { get; set; }
     public DateTime BillingPeriodFrom { get; set; }
     public DateTime BillingPeriodTo { get; set; }
+
+    public string DateFormat
+    {
+        get
+        {
+            return "MM/dd/yyyy";
+        }
+    }
+    public string CurrentDateStr
+    {
+        get
+        {
+            return DateTime.Today.ToString(DateFormat);
+        }
+    }
     public string BillingPeriodFromStr
     {
         get
@@ -117,14 +135,106 @@ public class InvoicePdfDto
         }
     }
 
+    public ContractInsurance Insurance { get; set; }
+    public ContractBankDetails bankDetails { get; set; }
+    public DateTime? EstimatedTerminationDate { get; set; }
+    public decimal InsuranceAmount { get; set; } //TODO added newly
+    public decimal lateFeeAmount { get; set; } //TODO added newly
+
     public string? FooterText1 { get; set; }
     public string? FooterText2 { get; set; }
 
+    public string TenantId { get; set; } // TODO is it string or GUID?
+
+    public string CultureCurrencySymbol { get; set; }
+
+    public string Building { get; set; }
+    public string BusinessCompanyName { get; set; }
+    public string hideandshow { get; set; }
+    public string exportHideandshow { get; set; }
+    public decimal InvoiceBalance { get; set; }
+    public string ClientContractNo { get; set; }
+    public CultureInfo CurrentCulture { get; set; }
+    public UnitWithStatus UnitStorageTypeInfo { get; set; }
     public PersonalDetails ClientDetails { get; set; }
     public PersonalDetails CustomerDetails { get; set; }
     public PersonalDetails RemitPaymentTo { get; set; }
     public List<PastDueDetails> PastDueList { get; set; }
     public List<InvoiceItemDetails> InvoiceItemList { get; set; }
+    public List<InvoiceLanguageCustomization> LanguageCustomizationList { get; set; }
+    public ClientAppAndDocumentConfig DocumentConfig { get; set; }
+    public List<ClientPaymentMode> clientPaymentMode { get; set; }
+    public ContractInvoiceDetails InvoiceDetail { get; set; }
+    public List<InvoiceAppliedTaxDetail> InvoiceAppliedTaxDetails { get; set; }
+
+    public List<ClientFieldConfig> optionalFields { get; set; }
+    public ClientOverallConfig ConfigurationData { get; set; }
+    public List<NewInvoicePDFModel> newInvoicePdfModel { get; set; }
+    public List<ContractDetails> MergedContractDetails { get; set; }
+    public List<LeaseInvoicePastDue> LeaseInvoicePastDue { get; set; }
+    public UnitDetails UnitInfo { get; set; }
+    public TransferTenantUnitDetail TransferTenantUnitDetail { get; set; }
+    public List<ClientPaymentMode> PaymentDisplayText { get; set; }
+
+    public bool GetDictionaryVisibleStatus(string keyword)
+    {
+        return GetDictionaryVisibility(keyword);
+    }
+
+    public bool GetDictionaryVisibility(string keyword)
+    {
+        bool result = false;
+        try
+        {
+            if (LanguageCustomizationList != null)
+            {
+                if (LanguageCustomizationList.Count > 0)
+                {
+                    if (!string.IsNullOrEmpty(keyword))
+                    {
+                        keyword = keyword.Trim();
+                        var firstData = LanguageCustomizationList.FirstOrDefault(x => x.KeywordName.ToLower() == keyword.ToLower());
+                        if (firstData != null)
+                        {
+                            result = firstData.VisibleStatus;
+                        }
+                    }
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            //objCommon.WriteExceptionLog(ex, "GetDicionaryVisibleStatus");
+            return false;
+        }
+        return result;
+    }
+
+    public string GetDictionaryItem(string keywordName)
+    {
+        string result = string.Empty;
+        try
+        {
+            if (LanguageCustomizationList.Count > 0)
+            {
+                if (!string.IsNullOrEmpty(keywordName))
+                {
+                    keywordName = keywordName.Trim();
+                    var firstData = LanguageCustomizationList.FirstOrDefault(x => x.KeywordName.ToLower() == keywordName.ToLower());
+                    if (firstData != null)
+                    {
+                        result = firstData.CustomValue;
+                    }
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            //objCommon.WriteExceptionLog(ex, "GetDictionaryItem");
+            return String.Empty;
+        }
+        return result;
+    }
 }
 
 public class PersonalDetails
@@ -187,3 +297,11 @@ public static class CurrencyHelper
         return $"${amount.ToString("0.00")}";
     }
 }
+
+public class InvoiceLanguageCustomization
+{
+    public string KeywordName { get; set; }
+    public string CustomValue { get; set; }
+    public bool VisibleStatus { get; set; }
+}
+

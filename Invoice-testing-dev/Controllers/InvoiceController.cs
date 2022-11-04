@@ -21,7 +21,7 @@ namespace Invoice_testing_dev.Controllers
                 model = JsonConvert.DeserializeObject<InvoicePdfDto>(JSON);
             } catch (Exception ex)
             {
-
+                Console.WriteLine(ex.Message);
             }
             return View(model);
         }

@@ -1,13 +1,16 @@
 ﻿@*
     For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 *@
-@using SixStorage.AutoInvoice.WebApi.Shared.DTOs.AutoInvoice
+
+@using System.Configuration;
+
+@using SixStorage.AutoInvoice.WebApi.Shared.DTOs.AutoInvoice;
 @model InvoicePdfDto
 @{
 }
 
 
-@functions{
+@functions {
 
     private Guid loginClientId = Guid.Empty;
     private IConfiguration configuration;
@@ -29,10 +32,10 @@
         }
         catch (Exception ex)
         {
-            
+
         }
-            return lstTranslationInfo;
-        }
+        return lstTranslationInfo;
+    }
 }
 
 <div id="dvInvoicePdf" style="padding:10px;">
@@ -260,8 +263,8 @@
         }
 
         /*tr {
-                page-break-inside: avoid !important;
-            }*/
+                        page-break-inside: avoid !important;
+                    }*/
         thead {
             display: table-header-group;
         }
@@ -281,9 +284,71 @@
         }
     </style>
 
+    
+    @{
+        var totalDue = Model.InvoiceTotalDue;
+        var latefee = Model.lateFeeAmount;
+        var insurance = Model.Insurance;
+        decimal iptAmnt = 0, iptPercentage = 0; // TODO have to assign the values
+        //iptAmnt = (insurance != null) ? Convert.ToDecimal(insurance.IPTAmount) : 0;
 
 
+        //var newInvoiceModel = Model.newInvoicePdfModel;
+        //var totalDue = Model.InvoiceBalance + Model.lateFeeAmount;
+        //var Latefee = Model.lateFeeAmount;
+        //var invoiceDetail = Model.InvoiceDetail;
+        //var insurance = Model.Insurance;
+        //if (invoiceDetail != null && insurance != null)
+        //{
+        //    invoiceDetail.InsuranceCharges = insurance.InsuranceAmount;
 
+        //}
+        //decimal iptAmnt = 0, iptPercentage = 0;
+        //iptAmnt = (insurance != null) ? Convert.ToDecimal(insurance.IPTAmount) : 0;
+        //var invoiceTotalAmnt = "0.00";  //TODO REMOVED - WHY - NOT USED
+        //if (invoiceDetail.TotalInvAmt != null)
+        //{
+        //    invoiceTotalAmnt = invoiceDetail.TotalInvAmt.ToString();
+        //}
+        //else
+        //{
+        //    invoiceTotalAmnt = "0.00";
+        //}
+        //
+        //decimal adjustamount = Convert.ToDecimal(invoiceDetail.OnAccountDebit);//Added by Desala on 11/12/2017
+        //string invoiceCreatedDate = invoiceDetail.InvoiceDate.ToShortDateString();
+        //string InvoiceFromDate = invoiceDetail.InvPeriodFrom != null ? Convert.ToDateTime(invoiceDetail.InvPeriodFrom).ToShortDateString() : "-";
+        //string invoiceToDate = invoiceDetail.InvPeriodTo != null ? Convert.ToDateTime(invoiceDetail.InvPeriodTo).ToShortDateString() : "-";
+        //string invoiceDueDate = invoiceDetail.InvoiceDueDate != null ? Convert.ToDateTime(invoiceDetail.InvoiceDueDate).ToShortDateString() : "-";
+        //string PaymentPeriod = (InvoiceFromDate == "-" && invoiceToDate == "-") ? "-" : InvoiceFromDate + " to " + invoiceToDate;
+        //var estimatedTerminationDate = Model.EstimatedTerminationDate != null ? Convert.ToDateTime(Model.EstimatedTerminationDate).ToShortDateString() : "-";
+
+        //TODO ADD NECESSARY CODE
+       // var adjustamount = 0;
+        decimal PastDue = 0;
+        //TODO end of ADD NECESSARY CODE
+
+        decimal adjustamount = Convert.ToDecimal(Model.PastDueBlanceTotal); // TODO confirm field used for invoiceDetail.OnAccountDebit??
+
+        var roundingoffValueCurrentInvoice = Convert.ToDecimal(Model.InvoiceTotalDue);  //Model.TotalInvAmt
+        var FinalAmount = (roundingoffValueCurrentInvoice - adjustamount);
+
+        decimal TotalValue = 0;
+        if (adjustamount > 0)
+        {
+            TotalValue = FinalAmount;
+        }
+        else
+        {
+            TotalValue = roundingoffValueCurrentInvoice;//variable name changed by prakash on sprint 22 07-11-2018.
+        }
+        if (PastDue > 0)
+        {
+            TotalValue += PastDue;
+        }
+        // Prakash commentted this code during sprint 22 on 07-11-2018. Reason Pastdue balance should not again round method.
+        //var RoundingoffTotalvalue = Storagebase.Helper.JQueryUIDatePickerHelper.GetRoundingoffValue(TotalValue);
+    }
 
     <div>
         <table style="margin-left:auto;margin-right:auto;">
@@ -294,37 +359,66 @@
                             <tbody>
                                 <tr>
                                 </tr>
+                                @if (Model.GetDictionaryVisibility("Display-FacilityAddress"))
+                                {
+                                    <tr>
+                                        <td>
+                                            <span style="text-align:left;font-weight:bold;text-decoration:underline"><b>@Model.GetDictionaryItem("Display-FacilityAddress")@*Facility Address :*@</b></span>
+                                        </td>
+                                    </tr>
+                                }
                                 <tr>
                                     <td>
-                                        <span style="text-align:left;font-weight:bold;text-decoration:underline"><b>Facility Address :</b></span>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>
-                                        <span>@Model.ClientDetails.CompanyName<br> </span>
-
-                                        <span>@Model.ClientDetails.AddressLine1</span>
-
-                                        <br>
-                                        <span>
-                                            @Model.ClientDetails.AddressLine2
+                                        @if (Model.GetDictionaryVisibility("sl_BusinessName"))
+                                        {
+                                            <span>@Model.ClientDetails.CompanyName<br> </span>
+                                        }
+                                        @if (Model.GetDictionaryVisibility("sl_AddresssLine1"))
+                                        {
+                                            <span>@Model.ClientDetails.AddressLine1</span>
                                             <br>
-                                        </span>
-                                        <span>@Model.ClientDetails.City</span>
-                                        <span>@Model.ClientDetails.State</span>
+                                        }
+                                        @if (Model.GetDictionaryVisibility("sl_AddresssLine2"))
+                                        {
+                                            <span>@Model.ClientDetails.AddressLine2</span>
+                                            <br />
+                                        }
+                                        @if (Model.GetDictionaryVisibility("sl_City"))
+                                        {
+                                            <span>@Model.ClientDetails.City</span>
+                                        }
+                                        @if (Model.GetDictionaryVisibility("sl_State"))
+                                        {
+                                            <span>@Model.ClientDetails.State</span>
+                                        }
+                                        @if (Model.GetDictionaryVisibility("sl_ZipCode"))
+                                        {
+                                            <span>@Model.ClientDetails.Zipcode</span>
+                                            <br>
+                                        }
+                                        @if (Model.GetDictionaryVisibility("sl_Country"))
+                                        {
+                                            <span>@Model.ClientDetails.Country</span>
+                                        }
 
-                                        <span>@Model.ClientDetails.Zipcode</span>
-                                        <br>
-                                        <span>@Model.ClientDetails.Country</span>
                                     </td>
                                 </tr>
                                 <tr>
 
 
                                     <td style="padding-top:10px;">
-                                        <span>@Model.ClientDetails.MobileNumber</span><br>
+                                        @if (Model.GetDictionaryVisibility("sl_MobileNumber"))
+                                        {
+                                            <span>@Model.ClientDetails.MobileNumber</span>
 
-                                        <span>@Model.ClientDetails.EmailAddress</span><br>
+                                            <br>
+                                        }
+                                        @if (Model.GetDictionaryVisibility("sl_E-Mailaddress"))
+                                        {
+                                            <span>@Model.ClientDetails.EmailAddress</span>
+
+                                            <br>
+                                        }
 
                                     </td>
                                 </tr>
@@ -335,8 +429,10 @@
                     <td style="text-align:right;padding-top:4px !important;display:block;" valign="top" id="imgtd">
 
 
-
-                        <img src="https://s3-us-west-2.amazonaws.com/storageadminlivedocs/logo1.jpg" style="width:250px;height:auto;" id="imglogo" alt="6Storage.Com">
+                        @if (Model.GetDictionaryVisibility("DisplayLogo"))
+                        {
+                            <img src="https://s3-us-west-2.amazonaws.com/storageadminlivedocs/logo1.jpg" style="width:250px;height:auto;" id="imglogo" alt="6Storage.Com">
+                        }
 
                     </td>
                 </tr>
@@ -349,29 +445,59 @@
                 </tr>
 
                 <tr>
-
-
                     <td style="padding-left:10px; padding-top:0px;vertical-align:top;">
                         <table style="max-width:385px;">
                             <tbody>
 
-
-                                <tr>
-                                    <td>
-                                        <span style="text-align:left;font-weight:bold;text-decoration:underline"><b>Invoice To :</b></span>
-                                    </td>
-                                </tr>
+                                @if (Model.GetDictionaryVisibility("Display-InvoiceTo"))
+                                {
+                                    <tr>
+                                        <td>
+                                            <span style="text-align:left;font-weight:bold;text-decoration:underline"><b>@Model.GetDictionaryItem("Display-InvoiceTo") : @*Invoice To :*@</b></span>
+                                        </td>
+                                    </tr>
+                                }
                                 <tr>
 
                                     <td style="width:105px;">
                                         <span style="font-size:11px;font-family:arial;font-weight:normal;">
-                                            <span>@Model.CustomerDetails.FirstName @Model.CustomerDetails.LastName<br></span>
-                                            @Model.CustomerDetails.AddressLine1<br>
-                                            @Model.CustomerDetails.AddressLine2<br>
-                                            @Model.CustomerDetails.City                                                        <span></span>
-                                            @Model.CustomerDetails.State<span></span>
-                                            @Model.CustomerDetails.Zipcode<br>
-                                            @Model.CustomerDetails.Country
+                                            @if (Model.GetDictionaryVisibility("DisplayTenantName"))
+                                            {
+                                                <span>
+                                                    @Model.CustomerDetails.FirstName
+                                                    @Model.CustomerDetails.LastName
+                                                    <br>
+                                                </span>
+                                            }
+                                            @if (Model.GetDictionaryVisibility("DisplayTenantAddresssLine1"))
+                                            {
+                                                @Model.CustomerDetails.AddressLine1
+                                                <br>
+                                            }
+                                            @if (Model.GetDictionaryVisibility("DisplayTenantAddresssLine2"))
+                                            {
+                                                @Model.CustomerDetails.AddressLine2
+                                                <br>
+                                            }
+                                            @if (Model.GetDictionaryVisibility("DisplayTenantCity"))
+                                            {
+                                                @Model.CustomerDetails.City
+                                                <span> </span>
+                                            }
+                                            @if (Model.GetDictionaryVisibility("DisplayTenantState"))
+                                            {
+                                                @Model.CustomerDetails.State
+                                                <span> </span>
+                                            }
+                                            @if (Model.GetDictionaryVisibility("DisplayTenantZipCode"))
+                                            {
+                                                @Model.CustomerDetails.Zipcode
+                                                <br>
+                                            }
+                                            @if (Model.GetDictionaryVisibility("DisplayTenantCountry"))
+                                            {
+                                                @Model.CustomerDetails.Country
+                                            }
                                         </span>
 
                                     </td>
@@ -382,175 +508,236 @@
                                             <tbody>
                                                 <tr>
                                                     <td style="padding:0px;">
-                                                        <span>@Model.CustomerDetails.MobileNumber<br></span>
+                                                        @if (Model.GetDictionaryVisibility("DisplayTenantMobileNumber"))
+                                                        {
+                                                            <span>@Model.CustomerDetails.MobileNumber<br></span>
+                                                        }
                                                     </td>
                                                 </tr>
                                                 <tr>
                                                     <td style="padding:0px;">
-                                                        <span>@Model.CustomerDetails.EmailAddress<br></span>
+                                                        @if (Model.GetDictionaryVisibility("DisplayTenantE-Mailaddress"))
+                                                        {
+                                                            <span>@Model.CustomerDetails.EmailAddress<br></span>
+                                                        }
                                                     </td>
                                                 </tr>
                                                 <tr>
                                                     <td style="padding:0px;">
-                                                        <span>Tax ID101: </span>  <span>@Model.CustomerDetails.TaxNumber</span>
+                                                        @if (Model.GetDictionaryVisibility("DisplayTenantTaxID"))
+                                                        {
+                                                            <span>Tax ID101: </span>  <span>@Model.CustomerDetails.TaxNumber</span>
+                                                        }
                                                     </td>
                                                 </tr>
                                             </tbody>
                                         </table>
                                     </td>
                                 </tr>
-
-
-
-
-
                             </tbody>
                         </table>
                     </td>
 
                     <td style="padding-top: 0px; vertical-align: top;">
-
-
                         <table align="right" style="line-height:1.4 !important">
                             <tbody>
 
+                                @if (Model.GetDictionaryVisibility("DisplayLabelHeaderDate"))
+                                {
+                                    <tr>
+                                        <td style="text-align:right;">
+                                            <span style="font-size:11px;font-family:arial;font-weight:bold;">@Model.GetDictionaryItem("DisplayLabelHeaderDate")@*Date*@</span>
+                                        </td>
+                                        <td class="salesInvdetailsRight-td">
+                                            <span style="font-size:11px;font-family:arial;font-weight:normal;">@Model.CurrentDateStr</span>
+                                        </td>
+                                    </tr>
+                                }
 
-                                <tr>
-                                    <td style="text-align:right;">
-                                        <span style="font-size:11px;font-family:arial;font-weight:bold;">Date</span>
-                                    </td>
-                                    <td class="salesInvdetailsRight-td">
-                                        <span style="font-size:11px;font-family:arial;font-weight:normal;">@Model.CurrentDateStr</span>
-                                    </td>
-                                </tr>
-
-
-                                <tr>
-                                    <td style="text-align:right;">
-                                        <span style="font-size:11px;font-family:arial;font-weight:bold;">Invoice Number</span>
-                                    </td>
-                                    <td class="salesInvdetailsRight-td">
-                                        <span style="font-size:11px;font-family:arial;font-weight:normal;">@Model.InvoiceNumber</span>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td style="text-align:right;">
-                                        <span style="font-size:11px;font-family:arial;font-weight:bold;">Page</span>
-                                    </td>
-                                    <td>
-                                        <span style="font-size:11px;font-family:arial;font-weight:normal;">1 - 1</span>
-                                    </td>
-                                </tr>
-
-                                <tr>
-                                    <td style="text-align:right;">
-                                        <span style="font-size:11px;font-family:arial;font-weight:bold;">Billing Period</span>
-                                    </td>
-                                    <td class="salesInvdetailsRight-td">
-                                        <span style="font-size:11px;font-family:arial;font-weight:normal;">@Model.BillingPeriodFromStr</span>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td style="text-align:right;padding-top:0px;">
-                                        <span style="font-size:11px;font-family:Arial;font-weight:bold;">to</span>
-                                    </td>
-                                    <td style="padding-top:0px;" class="salesInvdetailsRight-td">
-                                        <span style="font-size:11px;font-family:Arial;font-weight:normal;">@Model.BillingPeriodToStr</span>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td style="text-align:right;">
-                                        <span style="font-size:11px;font-family:arial;font-weight:bold;">Scheduled move out date</span>
-                                    </td>
-                                    <td class="salesInvdetailsRight-td">
-                                        <span style="font-size:11px;font-family:arial;font-weight:normal;">@Model.ScheduledMoveOutStr</span>
-                                    </td>
-                                </tr>
-
-                                <tr>
-                                    <td style="text-align:right;">
-                                        <span style="font-size:11px;font-family:arial;font-weight:bold;">Billing Cycle</span>
-                                    </td>
-                                    <td class="salesInvdetailsRight-td">
-                                        <span style="font-size:11px;font-family:arial;font-weight:normal;">@Model.BillingCycle</span>
-                                    </td>
-                                </tr>
-
+                                @if (Model.GetDictionaryVisibility("DisplayLabelHeaderInvoiceNumber"))
+                                {
+                                    <tr>
+                                        <td style="text-align:right;">
+                                            <span style="font-size:11px;font-family:arial;font-weight:bold;">@Model.GetDictionaryItem("DisplayLabelHeaderInvoiceNumber")@*Invoice Number*@</span>
+                                        </td>
+                                        <td class="salesInvdetailsRight-td">
+                                            <span style="font-size:11px;font-family:arial;font-weight:normal;">@Model.InvoiceNumber</span>
+                                        </td>
+                                    </tr>
+                                }
+                                @if (Model.GetDictionaryVisibility("DisplayLabelHeaderPage"))
+                                {
+                                    <tr>
+                                        <td style="text-align:right;">
+                                            <span style="font-size:11px;font-family:arial;font-weight:bold;">@Model.GetDictionaryItem("DisplayLabelHeaderPage")@*Page*@</span>
+                                        </td>
+                                        <td>
+                                            <span style="font-size:11px;font-family:arial;font-weight:normal;">1 - 1</span>
+                                        </td>
+                                    </tr>
+                                }
+                                @if (Model.GetDictionaryVisibility("DisplayLabelHeaderBillingPeriod"))
+                                {
+                                    <tr>
+                                        <td style="text-align:right;">
+                                            <span style="font-size:11px;font-family:arial;font-weight:bold;">@Model.GetDictionaryItem("DisplayLabelHeaderBillingPeriod")@*Billing Period*@</span>
+                                        </td>
+                                        <td class="salesInvdetailsRight-td">
+                                            <span style="font-size:11px;font-family:arial;font-weight:normal;">@Model.BillingPeriodFromStr</span>
+                                        </td>
+                                    </tr>
+                                }
+                                @if (Model.GetDictionaryVisibility("DisplayLabelHeaderBillingPeriodto"))
+                                {
+                                    <tr>
+                                        <td style="text-align:right;padding-top:0px;">
+                                            <span style="font-size:11px;font-family:Arial;font-weight:bold;">@Model.GetDictionaryItem("DisplayLabelHeaderBillingPeriodto")@*to*@</span>
+                                        </td>
+                                        <td style="padding-top:0px;" class="salesInvdetailsRight-td">
+                                            <span style="font-size:11px;font-family:Arial;font-weight:normal;">@Model.BillingPeriodToStr</span>
+                                        </td>
+                                    </tr>
+                                }
+                                @if (Model.GetDictionaryVisibility("DisplayLabelScheduleMoveOutDate"))
+                                {
+                                    <tr>
+                                        <td style="text-align:right;">
+                                            <span style="font-size:11px;font-family:arial;font-weight:bold;">@Model.GetDictionaryItem("DisplayLabelScheduleMoveOutDate")@*Scheduled move out date*@</span>
+                                        </td>
+                                        <td class="salesInvdetailsRight-td">
+                                            <span style="font-size:11px;font-family:arial;font-weight:normal;">@Model.ScheduledMoveOutStr</span>
+                                        </td>
+                                    </tr>
+                                }
+                                @if (Model.GetDictionaryVisibility("DisplayLabelHeaderBillingCycle"))
+                                {
+                                    <tr>
+                                        <td style="text-align:right;">
+                                            <span style="font-size:11px;font-family:arial;font-weight:bold;">@Model.GetDictionaryItem("DisplayLabelHeaderBillingCycle")@*Billing Cycle*@</span>
+                                        </td>
+                                        <td class="salesInvdetailsRight-td">
+                                            <span style="font-size:11px;font-family:arial;font-weight:normal;">@Model.BillingCycle</span>
+                                        </td>
+                                    </tr>
+                                }
                             </tbody>
                         </table>
                     </td>
                 </tr>
 
-                <tr>
-                    <td colspan="3" style="padding-top:20px; text-align: center;">
-                        <span style="font-size:25px!important;font-family:arial;">Sales Invoice</span>
-                    </td>
-                </tr>
+
+                @if (Model.GetDictionaryVisibility("DisplayLabelHeaderNameofthedocument"))
+                {
+                    <tr>
+                        <td colspan="3" style="padding-top:20px; text-align: center;">
+                            <span style="font-size:25px!important;font-family:arial;">@Model.GetDictionaryItem("DisplayLabelHeaderNameofthedocument")@*Sales Invoice*@</span>
+                        </td>
+                    </tr>
+                }
+
                 @if (Model.PastDueList.Count != 0)
                 {
                     <tr style="page-break-before:avoid;">
                         <td colspan="2">
-                            <span id="spnPastDueText" style="font-size:20px!important;"> Past Due</span>
+                            @if (Model.GetDictionaryVisibility("DisplayPastDueText"))
+                            {
+                                <span id="spnPastDueText" style="font-size:20px!important;">@Model.GetDictionaryItem("DisplayPastDueText")@*Past Due*@</span>
+                            }
                             <table style="page-break-before:avoid;">
                                 <tbody>
                                     <tr style="background: #eee;page-break-before:avoid;">
-
-                                        <th style="text-align:center;padding-top:1px;padding-bottom:1px;">
-                                            Unit number
-                                        </th>
-                                        <th style="text-align:center;padding-top:1px;padding-bottom:1px;">
-                                            Invoice Period
-                                        </th>
-                                        <th style="text-align:center;padding-top:1px;padding-bottom:1px;">
-                                            Balance
-                                        </th>
-                                        <th style="text-align:center;padding-top:1px;padding-bottom:1px;">
-                                            Late fee
-                                        </th>
-                                        <th style="text-align:right !important;padding-top:1px;padding-bottom:1px;padding-right:15px;">
-                                            Total
-                                        </th>
-                                    </tr>
-                                        @foreach (PastDueDetails pastDueItem in Model.PastDueList)
+                                        @if (Model.GetDictionaryVisibility("DisplayPastDueUnitnumber"))
                                         {
-                                            <tr style="page-break-before:avoid;">
+                                            <th style="text-align:center;padding-top:1px;padding-bottom:1px;">
+                                                @Model.GetDictionaryItem("DisplayPastDueUnitnumber")@*Unit number*@
+                                            </th>
+                                        }
+                                        @if (Model.GetDictionaryVisibility("DisplayPastDueInvoicePeriod"))
+                                        {
+                                            <th style="text-align:center;padding-top:1px;padding-bottom:1px;">
+                                                @Model.GetDictionaryItem("DisplayPastDueInvoicePeriod")@*Invoice Period*@
+                                            </th>
+                                        }
+                                        @if (Model.GetDictionaryVisibility("DisplayPastDueBalance"))
+                                        {
+                                            <th style="text-align:center;padding-top:1px;padding-bottom:1px;">
+                                                @Model.GetDictionaryItem("DisplayPastDueBalance")@*Balance*@
+                                            </th>
+                                        }
+                                        @if (Model.GetDictionaryVisibility("DisplayPastDueLatefee"))
+                                        {
+                                            <th style="text-align:center;padding-top:1px;padding-bottom:1px;">
+                                                @Model.GetDictionaryItem("DisplayPastDueLatefee")@*Late fee*@
+                                            </th>
+                                        }
+                                        @if (Model.GetDictionaryVisibility("DisplayPastDueTotal"))
+                                        {
+                                            <th style="text-align:right !important;padding-top:1px;padding-bottom:1px;padding-right:15px;">
+                                                @Model.GetDictionaryItem("DisplayPastDueTotal")@*Total*@
+                                            </th>
+                                        }
+                                    </tr>
+                                    @foreach (PastDueDetails pastDueItem in Model.PastDueList)
+                                    {
+                                        <tr style="page-break-before:avoid;">
+                                            @if (Model.GetDictionaryVisibility("DisplayPastDueUnitnumber"))
+                                            {
                                                 <td style="text-align:center;padding-top:1px;padding-bottom:1px;">
                                                     @pastDueItem.UnitNumber
                                                 </td>
+                                            }
+                                            @if (Model.GetDictionaryVisibility("DisplayPastDueInvoicePeriod"))
+                                            {
                                                 <td style="text-align:center;padding-top:1px;padding-bottom:1px;">
                                                     @pastDueItem.BillingPeriodStr
                                                 </td>
+                                            }
+                                            @if (Model.GetDictionaryVisibility("DisplayPastDueBalance"))
+                                            {
                                                 <td style="text-align:center;padding-top:1px;padding-bottom:1px;">
                                                     @CurrencyHelper.GetStringValue(pastDueItem.Balance)
                                                 </td>
+                                            }
+                                            @if (Model.GetDictionaryVisibility("DisplayPastDueLatefee"))
+                                            {
                                                 <td style="text-align:center;padding-top:1px;padding-bottom:1px;">
                                                     @CurrencyHelper.GetStringValue(pastDueItem.LateFee)
                                                 </td>
+                                            }
+                                            @if (Model.GetDictionaryVisibility("DisplayPastDueTotal"))
+                                            {
                                                 <td style="text-align:right;padding-top:1px;padding-bottom:1px;">
                                                     @CurrencyHelper.GetStringValue(pastDueItem.TotalDue)
+                                                    @{
+                                                        PastDue += Convert.ToDecimal(pastDueItem.TotalDue);
+                                                    }
                                                 </td>
-                                            </tr>
-                                        }
+                                            }
+                                        </tr>
+                                    }
                                 </tbody>
                             </table>
                         </td>
                     </tr>
                     <tr>
                         <td colspan="2">
-                            <table style="margin-top:15px;">
-                                <tbody>
-                                    <tr style=" border: 1px solid #ddd;">
-                                        <td style="visibility:hidden;width:30%;"></td>
-                                        <td style="visibility:hidden;width:35%;"></td>
-                                        <td colspan="2" style="text-align: center; font-weight: bold; padding-top: 9px; border-left: 1px solid #ddd; border-right: 1px solid white !important; padding-bottom: 9px;">
-                                            Past Due Balance
-                                        </td>
-                                        <td colspan="3" style="text-align: right; padding-top: 9px; padding-bottom: 9px; border-right: 1px solid #ddd;">
-                                            @CurrencyHelper.GetStringValue(Model.PastDueBlanceTotal)
-                                        </td>
-                                    </tr>
-                                </tbody>
-                            </table>
+                            @if (Model.GetDictionaryVisibility("DisplayPastDueBalanceAmount"))
+                            {
+                                <table style="margin-top:15px;">
+                                    <tbody>
+                                        <tr style=" border: 1px solid #ddd;">
+                                            <td style="visibility:hidden;width:30%;"></td>
+                                            <td style="visibility:hidden;width:35%;"></td>
+                                            <td colspan="2" style="text-align: center; font-weight: bold; padding-top: 9px; border-left: 1px solid #ddd; border-right: 1px solid white !important; padding-bottom: 9px;">
+                                                @Model.GetDictionaryItem("DisplayPastDueBalanceAmount")@*Past Due Balance*@
+                                            </td>
+                                            <td colspan="3" style="text-align: right; padding-top: 9px; padding-bottom: 9px; border-right: 1px solid #ddd;">
+                                                @CurrencyHelper.GetStringValue(Model.PastDueBlanceTotal)
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            }
                         </td>
                     </tr>
                 }
@@ -560,30 +747,48 @@
                         <table class="gridspan5" width="100%" style="width:100%;border:0;border-collapse:collapse;line-height:1.5;">
                             <thead>
                                 <tr style="font-size:11px;font-family:arial;border-bottom:1px solid #ddd;font-weight:bold;background:#eee;line-height:1;">
-                                    <th style="text-align:left !important; padding-top: 9px; padding-bottom: 9px; padding-left: 5px;width:25%;">
-                                        Item
-                                    </th>
-                                    <th style="text-align:right !important;padding-top:1px;padding-bottom:1px;width:30%;;">
-                                        Quantity
-                                    </th>
-                                    <th style="text-align:right !important;padding-top:1px;padding-bottom:1px;padding-right:6px;">
-                                        Gross Cost
-                                    </th>
+                                    @if (Model.GetDictionaryVisibility("DisplayCurrentDueItem"))
+                                    {
+                                        <th style="text-align:left !important; padding-top: 9px; padding-bottom: 9px; padding-left: 5px;width:25%;">
+                                            @Model.GetDictionaryItem("DisplayCurrentDueItem")@*Item*@
+                                        </th>
+                                    }
+                                    @if (Model.GetDictionaryVisibility("DisplayCurrentDueQuantity"))
+                                    {
+                                        <th style="text-align:right !important;padding-top:1px;padding-bottom:1px;width:30%;;">
+                                            @Model.GetDictionaryItem("DisplayCurrentDueQuantity")@*Quantity*@
+                                        </th>
+                                    }
+                                    @if (Model.GetDictionaryVisibility("DisplayCurrentDueGrossCost"))
+                                    {
+                                        <th style="text-align:right !important;padding-top:1px;padding-bottom:1px;padding-right:6px;">
+                                            @Model.GetDictionaryItem("DisplayCurrentDueGrossCost")@*Gross Cost*@
+                                        </th>
+                                    }
                                 </tr>
                             </thead>
                             <tbody>
                                 @foreach (InvoiceItemDetails invoiceItem in Model.InvoiceItemList)
                                 {
                                     <tr style="text-align:center; padding-top: 9px; padding-bottom: 9px; padding-left: 5px;">
-                                        <td style="text-align:left;padding-top:1px;padding-bottom:1px;">
-                                            @invoiceItem.ItemDescription
-                                        </td>
-                                        <td style="text-align:right;;padding-top:1px;padding-bottom:1px;">
-                                            @invoiceItem.Quantity
-                                        </td>
-                                        <td style="text-align:right;padding-top:1px;padding-bottom:1px;padding-right:6px;">
-                                            @CurrencyHelper.GetStringValue(invoiceItem.GrossCost)
-                                        </td>
+                                        @if (Model.GetDictionaryVisibility("DisplayCurrentDueItem"))
+                                        {
+                                            <td style="text-align:left;padding-top:1px;padding-bottom:1px;">
+                                                @invoiceItem.ItemDescription
+                                            </td>
+                                        }
+                                        @if (Model.GetDictionaryVisibility("DisplayCurrentDueQuantity"))
+                                        {
+                                            <td style="text-align:right;;padding-top:1px;padding-bottom:1px;">
+                                                @invoiceItem.Quantity
+                                            </td>
+                                        }
+                                        @if (Model.GetDictionaryVisibility("DisplayCurrentDueGrossCost"))
+                                        {
+                                            <td style="text-align:right;padding-top:1px;padding-bottom:1px;padding-right:6px;">
+                                                @CurrencyHelper.GetStringValue(invoiceItem.GrossCost)
+                                            </td>
+                                        }
                                     </tr>
                                 }
                             </tbody>
@@ -593,22 +798,27 @@
             </tbody>
         </table>
     </div>
-        <table>
-            <tbody>
+    <table>
+        <tbody>
+
+            @if (Model.GetDictionaryVisibility("DisplayTermsConditions"))
+            {
                 <tr>
                     <td colspan="5" align="center" style="font-size:12px!important;font-weight:normal;font-family:arial;">
-                        Please note terms &amp; conditions apply
+                        @Model.GetDictionaryItem("DisplayTermsConditions")@*Please note terms &amp; conditions apply*@
                     </td>
                 </tr>
-
-                <tr>
-                    <td colspan="2" style="width:100%;"></td>
-                    <td colspan="6">
+            }
+            <tr>
+                <td colspan="2" style="width:100%;"></td>
+                <td colspan="6">
+                    @if (Model.GetDictionaryVisibility("slminv_TotalwithoutRoundOffText"))
+                    {
                         <table align="right" style=";border:1px solid #ddd;">
                             <tbody>
                                 <tr>
                                     <td style="font-size:10px;font-family:arial;font-weight:bold;padding-right:80px;padding-top:8px;white-space:nowrap;padding-bottom:8px;">
-                                        Sub Total
+                                        @Model.GetDictionaryItem("slminv_TotalwithoutRoundOffText")@*Sub Total*@
                                     </td>
                                     <td style="font-size:10px;font-family:arial;font-weight:bold;text-align:right;white-space:nowrap;">
                                         @CurrencyHelper.GetStringValue(Model.InvoiceSubTotal)
@@ -616,16 +826,19 @@
                                 </tr>
                             </tbody>
                         </table>
-                    </td>
-                </tr>
-                <tr>
-                    <td colspan="2" style="width:100%;"></td>
-                    <td colspan="6">
+                    }
+                </td>
+            </tr>
+            <tr>
+                <td colspan="2" style="width:100%;"></td>
+                <td colspan="6">
+                    @if (Model.GetDictionaryVisibility("SlmInv_TotalTax"))
+                    {
                         <table align="right" style=";border:1px solid #ddd;">
                             <tbody>
                                 <tr>
                                     <td style="font-size:10px;font-family:arial;font-weight:bold;padding-right:80px;padding-top:8px;white-space:nowrap;padding-bottom:8px;">
-                                        Total Tax
+                                        @Model.GetDictionaryItem("SlmInv_TotalTax")@*Total Tax*@
                                     </td>
                                     <td style="font-size:10px;font-family:arial;font-weight:bold;text-align:right;white-space:nowrap;">
                                         @CurrencyHelper.GetStringValue(Model.InvoiceTaxTotal)
@@ -633,26 +846,47 @@
                                 </tr>
                             </tbody>
                         </table>
-                    </td>
-                </tr>
+                    }
+                </td>
+            </tr>
+            <tr>
+                <td colspan="2" style="width:100%;"></td>
+                <td colspan="6">
+                    <table align="right" style=";border:1px solid #ddd;">
+                        <tbody>
+                            <tr>
+                                <td style="font-size:10px;font-family:arial;font-weight:bold;padding-right:80px;padding-top:8px;white-space:nowrap;padding-bottom:8px;">
+                                    Current Due
+                                </td>
+                                <td style="font-size:10px;font-family:arial;font-weight:bold;text-align:right;white-space:nowrap;">
+                                    @CurrencyHelper.GetStringValue(Model.InvoiceCurrentDue)
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </td>
+            </tr>
+
+            if (adjustamount > 0)
+            {
                 <tr>
                     <td colspan="2" style="width:100%;"></td>
                     <td colspan="6">
-                        <table align="right" style=";border:1px solid #ddd;">
+                        <table align="right" style="border:1px solid #ddd;">
                             <tbody>
                                 <tr>
-                                    <td style="font-size:10px;font-family:arial;font-weight:bold;padding-right:80px;padding-top:8px;white-space:nowrap;padding-bottom:8px;">
-                                        Current Due
-                                    </td>
-                                    <td style="font-size:10px;font-family:arial;font-weight:bold;text-align:right;white-space:nowrap;">
-                                        @CurrencyHelper.GetStringValue(Model.InvoiceCurrentDue)
-                                    </td>
+                                    <td style="font-size:10px;font-family:arial;font-weight:bold;padding-right:80px;padding-top:8px;white-space:nowrap;padding-bottom:8px;">@Html.Raw(Model.GetDictionaryItem("DisplayAdjustedAdvanceBalanceText"))@*Balance*@</td>
+                                    <td style="font-size:10px;font-family:arial;font-weight:bold;text-align:right;white-space:nowrap;">@Convert.ToDecimal(FinalAmount).ToString("c")</td>
+
                                 </tr>
                             </tbody>
                         </table>
                     </td>
                 </tr>
+            }
 
+            @if (Model.GetDictionaryVisibility("DisplayPaymentDueon"))
+            {
                 <tr>
                     <td colspan="2" style="width:100%;"></td>
                     <td colspan="6">
@@ -660,7 +894,7 @@
                             <tbody>
                                 <tr>
                                     <td style="font-size:10px;font-family:arial;font-weight:bold;padding-right:80px;padding-top:8px;white-space:nowrap;padding-bottom:8px;">
-                                        Payment Due on
+                                        @Model.GetDictionaryItem("DisplayPaymentDueon")@*Payment Due on*@
                                     </td>
                                     <td style="font-size:10px;font-family:arial;font-weight:normal;text-align:right;font-weight:bold;white-space:nowrap;">
                                         @Model.PaymentDueDateStr
@@ -670,104 +904,524 @@
                         </table>
                     </td>
                 </tr>
+            }
+        </tbody>
+    </table>
 
+    <table id="tblPastDueTable" style="width: 100%;border: 1px solid #ddd !important; margin-bottom: 10px;border-collapse: collapse; page-break-inside: auto;" border="0">
+    </table>
 
-            </tbody>
-        </table>
-
-        <table id="tblPastDueTable" style="width: 100%;border: 1px solid #ddd !important; margin-bottom: 10px;border-collapse: collapse; page-break-inside: auto;" border="0">
-        </table>
-
-        <table align="right" style="width:100%;margin-right:0px;">
-            <tbody>
-                <tr style="border:1px solid #ddd;">
-                    <td style="visibility: hidden; width: 30%;"></td>
-                    <td style="visibility: hidden; width: 35%;"></td>
-                    <td style="font-size:10px;font-family:arial;border:1px solid #ddd;border-right:1px solid #fff; font-weight:bold;text-align:left; padding-right:15px;padding-top:8px;white-space:nowrap;padding-bottom:9px;">
-                        Total amount Due
-                    </td>
-                    <td style="font-size:10px;font-family:arial;font-weight:bold;text-align:right;white-space:nowrap;border:1px solid #ddd;border-left:1px solid #fff;width: 15%;">
-                        @CurrencyHelper.GetStringValue(Model.InvoiceTotalDue)
-                    </td>
-                </tr>
-            </tbody>
-        </table>
-
-
-
+    <table align="right" style="width:100%;margin-right:0px;">
+        <tbody>
+            <tr style="border:1px solid #ddd;">
+                <td style="visibility: hidden; width: 30%;"></td>
+                <td style="visibility: hidden; width: 35%;"></td>
+                <td style="font-size:10px;font-family:arial;border:1px solid #ddd;border-right:1px solid #fff; font-weight:bold;text-align:left; padding-right:15px;padding-top:8px;white-space:nowrap;padding-bottom:9px;">
+                    Total amount Due
+                </td>
+                <td style="font-size:10px;font-family:arial;font-weight:bold;text-align:right;white-space:nowrap;border:1px solid #ddd;border-left:1px solid #fff;width: 15%;">
+                    @CurrencyHelper.GetStringValue(Model.InvoiceTotalDue)
+                </td>
+            </tr>
+        </tbody>
+    </table>
 
     &nbsp;
 
-
-
-
-
-
-    @{
-        <table style="width:100%" id="leasegridspan">
-            <tbody>
-                <tr style="display:block;" id="remitTr">
-                    <td style="vertical-align:top; padding-bottom:20px;" id="remitTd">
-                        <table class="gridspan4">
-                            <tbody>
+    <table style="width:100%" id="leasegridspan">
+        <tbody>
+            <tr style="display:block;" id="remitTr">
+                <td style="vertical-align:top; padding-bottom:20px;" id="remitTd">
+                    <table class="gridspan4">
+                        <tbody>
+                            @if (Model.GetDictionaryVisibility("DisplayRemitPaymentto"))
+                        {
                                 <tr>
                                     <th style="text-decoration:underline;text-align:left !important;font-family:arial;font-size:9px;font-weight:bold;" id="remitpayTh">
 
-                                        Remit Payment to
+                                        @Model.GetDictionaryItem("DisplayRemitPaymentto")@*Remit Payment to*@
                                     </th>
                                 </tr>
-                                <tr>
-                                    <td style="font-size:9px;font-family:arial;font-weight:normal;padding-bottom:0px;" class="removewhite">
+                        }
+                            <tr>
+                                <td style="font-size:9px;font-family:arial;font-weight:normal;padding-bottom:0px;" class="removewhite">
+                                    @if (Model.GetDictionaryVisibility("DisplayRemitPaymenttoBusinessName"))
+                                {
                                         <span>@Model.RemitPaymentTo.CompanyName<br> </span>
+                                }
+                                    @if (Model.GetDictionaryVisibility("DisplayRemitPaymenttoAddresssLine1"))
+                                {
                                         <span>@Model.RemitPaymentTo.AddressLine1<br> </span>
+                                }
+                                    @if (Model.GetDictionaryVisibility("DisplayRemitPaymenttoAddresssLine2"))
+                                {
                                         <span>@Model.RemitPaymentTo.AddressLine2<br> </span>
+                                }
+                                    @if (Model.GetDictionaryVisibility("DisplayRemitPaymenttoCity"))
+                                {
                                         <span>@Model.RemitPaymentTo.City<br> </span>
+                                }
+                                    @if (Model.GetDictionaryVisibility("DisplayRemitPaymenttoState"))
+                                {
                                         <span>@Model.RemitPaymentTo.State<br> </span>
+                                }
+                                    @if (Model.GetDictionaryVisibility("DisplayRemitPaymenttoCountry"))
+                                {
                                         <span>@Model.RemitPaymentTo.Country<br> </span>
+                                }
+                                    @if (Model.GetDictionaryVisibility("DisplayRemitPaymenttoZipCode"))
+                                {
                                         <span>@Model.RemitPaymentTo.Zipcode<br> </span>
+                                }
+                                    @if (Model.GetDictionaryVisibility("DisplayRemitPaymentMobile"))
+                                {
                                         <span>@Model.RemitPaymentTo.MobileNumber</span>
+                                }
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </td>
+
+                @*DisplayBankDetails*@
+                @{
+                    var displayType = "none";
+                    var paymentdisplaytext = Model.clientPaymentMode;
+                    var StandingOrder = "StandingOrder";
+                    var OnlineBanking = "OnlineBanking";
+                    var MoneyOrder = "MoneyOrder";
+                    var CreditOrDebitCardTerminal = "CreditOrDebitCardTerminal";
+                    var CreditCard = "CreditCard";
+                    var Check = "Check";
+                    var Cash = "Cash";
+
+                    bool SI_IsDisplayBankInfo = Model.GetDictionaryVisibility("SI_IsDisplayBankInfo");
+                    bool SI_DisplayBankInfoForStandingOrder = Model.GetDictionaryVisibility("SI_DisplayBankInfoForStandingOrder");
+                    bool SI_DisplayBankInfoForOnlineBanking = Model.GetDictionaryVisibility("SI_DisplayBankInfoForOnlineBanking");
+                    bool SI_DisplayBankInfoForMoneyOrder = Model.GetDictionaryVisibility("SI_DisplayBankInfoForMoneyOrder");
+                    bool SI_DisplayBankInfoForCreditOrDebitCardTerminal = Model.GetDictionaryVisibility("SI_DisplayBankInfoForCreditOrDebitCardTerminal");
+                    bool SI_DisplayBankInfoForCreditCard = Model.GetDictionaryVisibility("SI_DisplayBankInfoForCreditCard");
+                    bool SI_DisplayBankInfoForCheck = Model.GetDictionaryVisibility("SI_DisplayBankInfoForCheck");
+                    bool SI_DisplayBankInfoForCash = Model.GetDictionaryVisibility("SI_DisplayBankInfoForCash");
+                    if (Model.GetDictionaryVisibility("SI_IsDisplayBankInfo"))
+                    {
+                        if (SI_IsDisplayBankInfo)
+                        {
+                            string paymentType = Model.Paymenttype.Trim().Replace(" ", "");
+                            foreach (var item in paymentdisplaytext)
+                            {
+                                if (item.ValueText == paymentType)
+                                {
+                                    paymentType = item.DisplayText.Trim().Replace(" ", "");
+                                }
+                                if (item.ValueText.ToUpper() == Cash.ToUpper())
+                                {
+                                    Cash = item.DisplayText.Trim().Replace(" ", "");
+                                }
+                                else if (item.ValueText.ToUpper() == Check.ToUpper())
+                                {
+                                    Check = item.DisplayText.Trim().Replace(" ", "");
+                                }
+                                else if (item.ValueText.ToUpper() == CreditCard.ToUpper())
+                                {
+                                    CreditCard = item.DisplayText.Trim().Replace(" ", "");
+                                }
+                                else if (item.ValueText.ToUpper() == CreditOrDebitCardTerminal.ToUpper())
+                                {
+                                    CreditOrDebitCardTerminal = item.DisplayText.Trim().Replace(" ", "");
+                                }
+                                else if (item.ValueText.ToUpper() == MoneyOrder.ToUpper())
+                                {
+                                    MoneyOrder = item.DisplayText.Trim().Replace(" ", "");
+                                }
+                                else if (item.ValueText.ToUpper() == OnlineBanking.ToUpper())
+                                {
+                                    OnlineBanking = item.DisplayText.Trim().Replace(" ", "");
+                                }
+                                else if (item.ValueText.ToUpper() == StandingOrder.ToUpper())
+                                {
+                                    StandingOrder = item.DisplayText.Trim().Replace(" ", "");
+                                }
+                            }
+
+                            if ((SI_DisplayBankInfoForStandingOrder && paymentType.ToUpper() == StandingOrder.ToUpper()) ||
+                                (SI_DisplayBankInfoForOnlineBanking && paymentType.ToUpper() == OnlineBanking.ToUpper()) ||
+                                (SI_DisplayBankInfoForMoneyOrder && paymentType.ToUpper() == MoneyOrder.ToUpper()) ||
+                                (SI_DisplayBankInfoForCreditOrDebitCardTerminal && paymentType.ToUpper() == CreditOrDebitCardTerminal.ToUpper()) ||
+                                (SI_DisplayBankInfoForCreditCard && paymentType.ToUpper() == CreditCard.ToUpper()) ||
+                                (SI_DisplayBankInfoForCheck && paymentType.ToUpper() == Check.ToUpper()) ||
+                                (SI_DisplayBankInfoForCash && paymentType.ToUpper() == Cash.ToUpper()))
+                            {
+                                displayType = "table-cell";
+                            }
+                            else
+                            {
+                                displayType = "none";
+                            }
+                        }
+                        else
+                        {
+                            displayType = "table-cell";
+                        }
+                    }
+                }
+                <td style="vertical-align:top; padding-left:50px; display:@displayType;">
+                    <table class="gridspan4 acgridspan4">
+                        <tbody>
+                            <tr>
+                                @if (Model.GetDictionaryVisibility("DisplayBankdetails"))
+                        {
+                                    <th style="text-decoration:underline;text-align:left !important;font-family:arial;font-size:9px;padding-bottom:8px;" id="BankdetailsTd">
+                                        @*Bank Details*@
+
+                                        @Html.Raw(Model.GetDictionaryItem("DisplayBankdetails"))
+                                    </th>
+                        }
+                            </tr>
+                            <tr>
+                                @if (Model.GetDictionaryVisibility("DisplayAccountNumber"))
+                        {
+                                    <td style="font-size:9px;font-family:Arial;font-weight:normal;text-align:left;">
+                                        @*Account Number*@
+                                        @Html.Raw(Model.GetDictionaryItem("DisplayAccountNumber"))
+                                    </td>
+                                    <td style="font-size:9px;font-family:arial;font-weight:normal;">
+                                        @if (!string.IsNullOrEmpty(Model.DocumentConfig.InvoiceAccountNumber))
+                            {
+                                            <span>:&nbsp; @Model.DocumentConfig.InvoiceAccountNumber</span>
+                            }
+                                    </td>
+                        }
+                            </tr>
+                            <tr>
+                                @if (Model.GetDictionaryVisibility("DisplaySortcode"))
+                        {
+                                    <td style="font-size:9px;font-family:arial;font-weight:normal;text-align:left;">
+                                        @*Sort Code*@
+                                        @*Routing Number*@
+                                        @Html.Raw(Model.GetDictionaryItem("DisplaySortcode"))
+                                    </td>
+                                    <td style="font-size:9px;font-family:arial;font-weight:normal;">
+                                        @if (!string.IsNullOrEmpty(Model.DocumentConfig.InvoiceSortCode))
+                                {
+                                            <span>:&nbsp; @Model.DocumentConfig.InvoiceSortCode</span>
+                                }
+                                    </td>
+                        }
+                            </tr>
+                            @if (Model.GetDictionaryVisibility("DisplaySwiftBICCode"))
+                    {
+                                <tr>
+                                    <td style="font-size:9px;font-family:arial;font-weight:normal;text-align:left;">
+                                        @*SWIFT / BIC*@
+                                        @Html.Raw(Model.GetDictionaryItem("DisplaySwiftBICCode"))
+                                    </td>
+                                    <td style="font-size:9px;font-family:arial;font-weight:normal;">
+                                        @if (!string.IsNullOrEmpty(Model.DocumentConfig.InvoiceSwiftOrBIC))
+                                {
+                                            <span>:&nbsp; @Model.DocumentConfig.InvoiceSwiftOrBIC</span>
+                                }
                                     </td>
                                 </tr>
-                            </tbody>
-                        </table>
-                    </td>
+                    }
 
-
-
-                    <td style="vertical-align:top; padding-left:50px; display:none;">
-                        <table class="gridspan4 acgridspan4">
-                            <tbody>
+                            @if (Model.GetDictionaryVisibility("DisplayIBAN"))
+                    {
                                 <tr>
+                                    <td style="font-size:9px;font-family:arial;font-weight:normal;text-align:left;">
+                                        @*IBAN*@
+                                        @Html.Raw(Model.GetDictionaryItem("DisplayIBAN"))
+                                    </td>
+                                    <td style="font-size:9px;font-family:arial;font-weight:normal;" id="ibanTd">
+                                        @if (!string.IsNullOrEmpty(Model.DocumentConfig.InvoiceIBAN))
+                                {
+                                            <span>:&nbsp; @Model.DocumentConfig.InvoiceIBAN</span>
+                                }
+                                    </td>
                                 </tr>
-                                <tr>
-                                </tr>
-                                <tr>
-                                </tr>
-
-
-                            </tbody>
-                        </table>
-                    </td>
-                </tr>
-
-                <tr>
-                    <td>
-                        Footer Note
-                    </td>
-                </tr>
-            </tbody>
-        </table>
+                    }
+                        </tbody>
+                    </table>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    Footer Note
+                </td>
+            </tr>
+        </tbody>
+    </table>
+        
+    @if (Model.GetDictionaryVisibility("DisplayAddPaymentLink"))
+    {
+        <div style="text-align:center;margin-top:50px;">
+            <a target="_blank" rel="noreferrer" href="https://secureclient.8storage.com/login/10b074c6-cf0e-4704-9eee-013d1e1dd98c" style="font-size:16px;font-weight:700;text-decoration:underline;">
+                @Model.GetDictionaryVisibility("DisplayAddPaymentLink") ? @Model.GetDictionaryItem("DisplayAddPaymentLink") : Click here to pay
+            </a>
+        </div>
     }
 
-    <div style="text-align:center;margin-top:50px;">
-        <a target="_blank" rel="noreferrer" href="https://secureclient.8storage.com/login/10b074c6-cf0e-4704-9eee-013d1e1dd98c" style="font-size:16px;font-weight:700;text-decoration:underline;">Click here to pay</a>
-    </div>
-
+    @if (Model.GetDictionaryVisibility("DisplayAddBarCode128"))
+    {
+        @* 
     <div style="text-align:center;margin-top:50px;">
         <img id="barcode" class="barcode" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAaYAAAC0CAYAAADfGIgnAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAACj8SURBVHhe7ZfRDiuHjcX2/3+6az4cgJCVk4lRN04rAsGIouamsLPX2P978S/+gTwh+21n4mnT5wzNWwN7a2BvDeytgb01sLcG9tbA3hpsLTvP8LSBvTWwtwb21sDeGthbA3trYG8NNg9p2XmGrQfv5k3m8KSF7Qa8yzxv43PnJ8wb2N6BT97b7mDbZ5e9n5mP7/P6rN+/BMh+25l42vQ5Q/PWwN4a2FsDe2tgbw3srYG9NbC3BlvLzjM8bWBvDeytgb01sLcG9tbA3hrYW4PNQ1p2nmHrwbt5kzk8aWG7Ae8yz9v43PkJ8wa2d+CT97Y72PbZZe9n5uP7vD7r9y8Bst92Jp42fc7QvDWwtwb21sDeGthbA3trYG8N7K3B1rLzDE8b2FsDe2tgbw3srYG9NbC3BvbWYPOQlp1n2Hrwbt5kDk9a2G7Au8zzNj53fsK8ge0d+OS97Q62fXbZ+5n5+D6vz/r9S4Dst52Jp02fMzRvDeytgb01sLcG9tbA3hrYWwN7a7C17DzD0wb21sDeGthbA3trYG8N7K2BvTXYPKRl5xm2HrybN5nDkxa2G/Au87yNz52fMG9gewc+eW+7g22fXfZ+Zj6+z+uzfv8SIPttZ+Jp0+cMzVsDe2tgbw3srYG9NbC3BvbWwN4abC07z/C0gb01sLcG9tbA3hrYWwN7a2BvDTYPadl5hq0H7+ZN5vCkhe0GvMs8b+Nz5yfMG9jegU/e2+5g22eXvZ+Zj+/z+qzfvwTIftuZeNr0OUPz1sDeGthbA3trYG8N7K2BvTWwtwZby84zPG1gbw3srYG9NbC3BvbWwN4a2FuDzUNadp5h68G7eZM5PGlhuwHvMs/b+Nz5CfMGtnfgk/e2O9j22WXvZ+bj+7w+6/cvAbLfdiaeNn3O0Lw1sLcG9tbA3hrYWwN7a2BvDeytwday8wxPG9hbA3trYG8N7K2BvTWwtwb21mDzkJadZ9h68G7eZA5PWthuwLvM8zY+d37CvIHtHfjkve0Otn122fuZ+fg+r8/6/UuA7LediadNnzM0bw3srYG9NbC3BvbWwN4a2FsDe2uwtew8w9MG9tbA3hrYWwN7a2BvDeytgb012DykZecZth68mzeZw5MWthvwLvO8jc+dnzBvYHsHPnlvu4Ntn132fmY+vs/rs37/EiD7bWfiadPnDM1bA3trYG8N7K2BvTWwtwb21sDeGmwtO8/wtIG9NbC3BvbWwN4a2FsDe2tgbw02D2nZeYatB+/mTebwpIXtBrzLPG/jc+cnzBvY3oFP3tvuYNtnl72fmY/v8/qs378EyH7bmXja9DlD89bA3hrYWwN7a2BvDeytgb01sLcGW8vOMzxtYG8N7K2BvTWwtwb21sDeGthbg81DWnaeYevBu3mTOTxpYbsB7zLP2/jc+QnzBrZ34JP3tjvY9tll72fm4/u8Puv3LwGy33YmnjZ9ztC8NbC3BvbWwN4a2FsDe2tgbw3srcHWsvMMTxvYWwN7a2BvDeytgb01sLcG9tZg85CWnWfYevBu3mQOT1rYbsC7zPM2Pnd+wryB7R345L3tDrZ9dtn7mfn4Pq/P+v1LgOy3nYmnTZ8zNG8N7K2BvTWwtwb21sDeGthbA3trsLXsPMPTBvbWwN4a2FsDe2tgbw3srYG9Ndg8pGXnGbYevJs3mcOTFrYb8C7zvI3PnZ8wb2B7Bz55b7uDbZ9d9n5mPr7P67N+/xIg+21n4mnT5wzNWwN7a2BvDeytgb01sLcG9tbA3hpsLTvP8LSBvTWwtwb21sDeGthbA3trYG8NNg9p2XmGrQfv5k3m8KSF7Qa8yzxv43PnJ8wb2N6BT97b7mDbZ5e9n5mP7/P6rN+/BMh+25l42vQ5Q/PWwN4a2FsDe2tgbw3srYG9NbC3BlvLzjM8bWBvDeytgb01sLcG9tbA3hrYW4PNQ1p2nmHrwbt5kzk8aWG7Ae8yz9v43PkJ8wa2d+CT97Y72PbZZe9n5uP7vD7r9y8Bst92Jp42fc7QvDWwtwb21sDeGthbA3trYG8N7K3B1rLzDE8b2FsDe2tgbw3srYG9NbC3BvbWYPOQlp1n2Hrwbt5kDk9a2G7Au8zzNj53fsK8ge0d+OS97Q62fXbZ+5n5+D6vz/r9S4Dst52Jp02fMzRvDeytgb01sLcG9tbA3hrYWwN7a7C17DzD0wb21sDeGthbA3trYG8N7K2BvTXYPKRl5xm2HrybN5nDkxa2G/Au87yNz52fMG9gewc+eW+7g22fXfZ+Zj6+z+uzfv8SIPttZ+Jp0+cMzVsDe2tgbw3srYG9NbC3BvbWwN4abC07z/C0gb01sLcG9tbA3hrYWwN7a2BvDTYPadl5hq0H7+ZN5vCkhe0GvMs8b+Nz5yfMG9jegU/e2+5g22eXvZ+Zj+/z+qzfvwTIftuZeNr0OUPz1sDeGthbA3trYG8N7K2BvTWwtwZby84zPG1gbw3srYG9NbC3BvbWwN4a2FuDzUNadp5h68G7eZM5PGlhuwHvMs/b+Nz5CfMGtnfgk/e2O9j22WXvZ+bj+7w+6/cvAbLfdiaeNn3O0Lw1sLcG9tbA3hrYWwN7a2BvDeytwday8wxPG9hbA3trYG8N7K2BvTWwtwb21mDzkJadZ9h68G7eZA5PWthuwLvM8zY+d37CvIHtHfjkve0Otn122fuZ+fg+r8/6/UuA7LediadNnzM0bw3srYG9NbC3BvbWwN4a2FsDe2uwtew8w9MG9tbA3hrYWwN7a2BvDeytgb012DykZecZth68mzeZw5MWthvwLvO8jc+dnzBvYHsHPnlvu4Ntn132fmY+vs/rs37/EiD7bWfiadPnDM1bA3trYG8N7K2BvTWwtwb21sDeGmwtO8/wtIG9NbC3BvbWwN4a2FsDe2tgbw02D2nZeYatB+/mTebwpIXtBrzLPG/jc+cnzBvY3oFP3tvuYNtnl72fmY/v8/qs378EyH7bmXja9DlD89bA3hrYWwN7a2BvDeytgb01sLcGW8vOMzxtYG8N7K2BvTWwtwb21sDeGthbg81DWnaeYevBu3mTOTxpYbsB7zLP2/jc+QnzBrZ34JP3tjvY9tll72fm4/u8Puv3LwGy33YmnjZ9ztC8NbC3BvbWwN4a2FsDe2tgbw3srcHWsvMMTxvYWwN7a2BvDeytgb01sLcG9tZg85CWnWfYevBu3mQOT1rYbsC7zPM2Pnd+wryB7R345L3tDrZ9dtn7mfn4Pq/P+v1LgOy3nYmnTZ8zNG8N7K2BvTWwtwb21sDeGthbA3trsLXsPMPTBvbWwN4a2FsDe2tgbw3srYG9Ndg8pGXnGbYevJs3mcOTFrYb8C7zvI3PnZ8wb2B7Bz55b7uDbZ9d9n5mPr7P67N+/xIg+21n4mnT5wzNWwN7a2BvDeytgb01sLcG9tbA3hpsLTvP8LSBvTWwtwb21sDeGthbA3trYG8NNg9p2XmGrQfv5k3m8KSF7Qa8yzxv43PnJ8wb2N6BT97b7mDbZ5e9n5mP7/P6rN+/BMh+25l42vQ5Q/PWwN4a2FsDe2tgbw3srYG9NbC3BlvLzjM8bWBvDeytgb01sLcG9tbA3hrYW4PNQ1p2nmHrwbt5kzk8aWG7Ae8yz9v43PkJ8wa2d+CT97Y72PbZZe9n5uP7vD7r9y8Bst92Jp42fc7QvDWwtwb21sDeGthbA3trYG8N7K3B1rLzDE8b2FsDe2tgbw3srYG9NbC3BvbWYPOQlp1n2Hrwbt5kDk9a2G7Au8zzNj53fsK8ge0d+OS97Q62fXbZ+5n5+D6vz/r9S4Dst52Jp02fMzRvDeytgb01sLcG9tbA3hrYWwN7a7C17DzD0wb21sDeGthbA3trYG8N7K2BvTXYPKRl5xm2HrybN5nDkxa2G/Au87yNz52fMG9gewc+eW+7g22fXfZ+Zj6+z+uzfv8SIPttZ+Jp0+cMzVsDe2tgbw3srYG9NbC3BvbWwN4abC07z/C0gb01sLcG9tbA3hrYWwN7a2BvDTYPadl5hq0H7+ZN5vCkhe0GvMs8b+Nz5yfMG9jegU/e2+5g22eXvZ+Zj+/z+qzfvwTIftuZeNr0OUPz1sDeGthbA3trYG8N7K2BvTWwtwZby84zPG1gbw3srYG9NbC3BvbWwN4a2FuDzUNadp5h68G7eZM5PGlhuwHvMs/b+Nz5CfMGtnfgk/e2O9j22WXvZ+bj+7w+6/cvAbLfdiaeNn3O0Lw1sLcG9tbA3hrYWwN7a2BvDeytwday8wxPG9hbA3trYG8N7K2BvTWwtwb21mDzkJadZ9h68G7eZA5PWthuwLvM8zY+d37CvIHtHfjkve0Otn122fuZ+fg+r8/6/UuA7LediadNnzM0bw3srYG9NbC3BvbWwN4a2FsDe2uwtew8w9MG9tbA3hrYWwN7a2BvDeytgb012DykZecZth68mzeZw5MWthvwLvO8jc+dnzBvYHsHPnlvu4Ntn132fmY+vs/rs37/EiD7bWfiadPnDM1bA3trYG8N7K2BvTWwtwb21sDeGmwtO8/wtIG9NbC3BvbWwN4a2FsDe2tgbw02D2nZeYatB+/mTebwpIXtBrzLPG/jc+cnzBvY3oFP3tvuYNtnl72fmY/v8/qs378EyH7bmXja9DlD89bA3hrYWwN7a2BvDeytgb01sLcGW8vOMzxtYG8N7K2BvTWwtwb21sDeGthbg81DWnaeYevBu3mTOTxpYbsB7zLP2/jc+QnzBrZ34JP3tjvY9tll72fm4/u8Puv3LwGy33YmnjZ9ztC8NbC3BvbWwN4a2FsDe2tgbw3srcHWsvMMTxvYWwN7a2BvDeytgb01sLcG9tZg85CWnWfYevBu3mQOT1rYbsC7zPM2Pnd+wryB7R345L3tDrZ9dtn7mfn4Pq/P+v1LgOy3nYmnTZ8zNG8N7K2BvTWwtwb21sDeGthbA3trsLXsPMPTBvbWwN4a2FsDe2tgbw3srYG9Ndg8pGXnGbYevJs3mcOTFrYb8C7zvI3PnZ8wb2B7Bz55b7uDbZ9d9n5mPr7P67N+/xIg+21n4mnT5wzNWwN7a2BvDeytgb01sLcG9tbA3hpsLTvP8LSBvTWwtwb21sDeGthbA3trYG8NNg9p2XmGrQfv5k3m8KSF7Qa8yzxv43PnJ8wb2N6BT97b7mDbZ5e9n5mP7/P6rN+/BMh+25l42vQ5Q/PWwN4a2FsDe2tgbw3srYG9NbC3BlvLzjM8bWBvDeytgb01sLcG9tbA3hrYW4PNQ1p2nmHrwbt5kzk8aWG7Ae8yz9v43PkJ8wa2d+CT97Y72PbZZe9n5uP7vD7r9y8Bst92Jp42fc7QvDWwtwb21sDeGthbA3trYG8N7K3B1rLzDE8b2FsDe2tgbw3srYG9NbC3BvbWYPOQlp1n2Hrwbt5kDk9a2G7Au8zzNj53fsK8ge0d+OS97Q62fXbZ+5n5+D6vz/r9S4Dst52Jp02fMzRvDeytgb01sLcG9tbA3hrYWwN7a7C17DzD0wb21sDeGthbA3trYG8N7K2BvTXYPKRl5xm2HrybN5nDkxa2G/Au87yNz52fMG9gewc+eW+7g22fXfZ+Zj6+z+uzfv8SIPttZ+Jp0+cMzVsDe2tgbw3srYG9NbC3BvbWwN4abC07z/C0gb01sLcG9tbA3hrYWwN7a2BvDTYPadl5hq0H7+ZN5vCkhe0GvMs8b+Nz5yfMG9jegU/e2+5g22eXvZ+Zj+/z+qzfvwTIftuZeNr0OUPz1sDeGthbA3trYG8N7K2BvTWwtwZby84zPG1gbw3srYG9NbC3BvbWwN4a2FuDzUNadp5h68G7eZM5PGlhuwHvMs/b+Nz5CfMGtnfgk/e2O9j22WXvZ+bj+7w+6/cvAbLfdiaeNn3O0Lw1sLcG9tbA3hrYWwN7a2BvDeytwday8wxPG9hbA3trYG8N7K2BvTWwtwb21mDzkJadZ9h68G7eZA5PWthuwLvM8zY+d37CvIHtHfjkve0Otn122fuZ+fg+r8/6/UuA7LediadNnzM0bw3srYG9NbC3BvbWwN4a2FsDe2uwtew8w9MG9tbA3hrYWwN7a2BvDeytgb012DykZecZth68mzeZw5MWthvwLvO8jc+dnzBvYHsHPnlvu4Ntn132fmY+vs/rs37/EiD7bWfiadPnDM1bA3trYG8N7K2BvTWwtwb21sDeGmwtO8/wtIG9NbC3BvbWwN4a2FsDe2tgbw02D2nZeYatB+/mTebwpIXtBrzLPG/jc+cnzBvY3oFP3tvuYNtnl72fmY/v8/qs378EyH7bmXja9DlD89bA3hrYWwN7a2BvDeytgb01sLcGW8vOMzxtYG8N7K2BvTWwtwb21sDeGthbg81DWnaeYevBu3mTOTxpYbsB7zLP2/jc+QnzBrZ34JP3tjvY9tll72fm4/u8Puv3LwGy33YmnjZ9ztC8NbC3BvbWwN4a2FsDe2tgbw3srcHWsvMMTxvYWwN7a2BvDeytgb01sLcG9tZg85CWnWfYevBu3mQOT1rYbsC7zPM2Pnd+wryB7R345L3tDrZ9dtn7mfn4Pq/P+v1LgOy3nYmnTZ8zNG8N7K2BvTWwtwb21sDeGthbA3trsLXsPMPTBvbWwN4a2FsDe2tgbw3srYG9Ndg8pGXnGbYevJs3mcOTFrYb8C7zvI3PnZ8wb2B7Bz55b7uDbZ9d9n5mPr7P67N+/xIg+21n4mnT5wzNWwN7a2BvDeytgb01sLcG9tbA3hpsLTvP8LSBvTWwtwb21sDeGthbA3trYG8NNg9p2XmGrQfv5k3m8KSF7Qa8yzxv43PnJ8wb2N6BT97b7mDbZ5e9n5mP7/P6rN+/BMh+25l42vQ5Q/PWwN4a2FsDe2tgbw3srYG9NbC3BlvLzjM8bWBvDeytgb01sLcG9tbA3hrYW4PNQ1p2nmHrwbt5kzk8aWG7Ae8yz9v43PkJ8wa2d+CT97Y72PbZZe9n5uP7vD7r9y8Bst92Jp42fc7QvDWwtwb21sDeGthbA3trYG8N7K3B1rLzDE8b2FsDe2tgbw3srYG9NbC3BvbWYPOQlp1n2Hrwbt5kDk9a2G7Au8zzNj53fsK8ge0d+OS97Q62fXbZ+5n5+D6vz/r9S4Dst52Jp02fMzRvDeytgb01sLcG9tbA3hrYWwN7a7C17DzD0wb21sDeGthbA3trYG8N7K2BvTXYPKRl5xm2HrybN5nDkxa2G/Au87yNz52fMG9gewc+eW+7g22fXfZ+Zj6+z+uzfv8SIPttZ+Jp0+cMzVsDe2tgbw3srYG9NbC3BvbWwN4abC07z/C0gb01sLcG9tbA3hrYWwN7a2BvDTYPadl5hq0H7+ZN5vCkhe0GvMs8b+Nz5yfMG9jegU/e2+5g22eXvZ+Zj+/z+qzfvwTIftuZeNr0OUPz1sDeGthbA3trYG8N7K2BvTWwtwZby84zPG1gbw3srYG9NbC3BvbWwN4a2FuDzUNadp5h68G7eZM5PGlhuwHvMs/b+Nz5CfMGtnfgk/e2O9j22WXvZ+bj+7w+6/cvAbLfdiaeNn3O0Lw1sLcG9tbA3hrYWwN7a2BvDeytwday8wxPG9hbA3trYG8N7K2BvTWwtwb21mDzkJadZ9h68G7eZA5PWthuwLvM8zY+d37CvIHtHfjkve0Otn122fuZ+fg+r8/6/UuA7LediadNnzM0bw3srYG9NbC3BvbWwN4a2FsDe2uwtew8w9MG9tbA3hrYWwN7a2BvDeytgb012DykZecZth68mzeZw5MWthvwLvO8jc+dnzBvYHsHPnlvu4Ntn132fmY+vs/rs37/EiD7bWfiadPnDM1bA3trYG8N7K2BvTWwtwb21sDeGmwtO8/wtIG9NbC3BvbWwN4a2FsDe2tgbw02D2nZeYatB+/mTebwpIXtBrzLPG/jc+cnzBvY3oFP3tvuYNtnl72fmY/v8/qs378EyH7bmXja9DlD89bA3hrYWwN7a2BvDeytgb01sLcGW8vOMzxtYG8N7K2BvTWwtwb21sDeGthbg81DWnaeYevBu3mTOTxpYbsB7zLP2/jc+QnzBrZ34JP3tjvY9tll72fm4/u8Puv3LwGy33YmnjZ9ztC8NbC3BvbWwN4a2FsDe2tgbw3srcHWsvMMTxvYWwN7a2BvDeytgb01sLcG9tZg85CWnWfYevBu3mQOT1rYbsC7zPM2Pnd+wryB7R345L3tDrZ9dtn7mfn4Pq/P+v1LgOy3nYmnTZ8zNG8N7K2BvTWwtwb21sDeGthbA3trsLXsPMPTBvbWwN4a2FsDe2tgbw3srYG9Ndg8pGXnGbYevJs3mcOTFrYb8C7zvI3PnZ8wb2B7Bz55b7uDbZ9d9n5mPr7P67N+/xIg+21n4mnT5wzNWwN7a2BvDeytgb01sLcG9tbA3hpsLTvP8LSBvTWwtwb21sDeGthbA3trYG8NNg9p2XmGrQfv5k3m8KSF7Qa8yzxv43PnJ8wb2N6BT97b7mDbZ5e9n5mP7/P6rN+/BMh+25l42vQ5Q/PWwN4a2FsDe2tgbw3srYG9NbC3BlvLzjM8bWBvDeytgb01sLcG9tbA3hrYW4PNQ1p2nmHrwbt5kzk8aWG7Ae8yz9v43PkJ8wa2d+CT97Y72PbZZe9n5uP7vD7r9y8Bst92Jp42fc7QvDWwtwb21sDeGthbA3trYG8N7K3B1rLzDE8b2FsDe2tgbw3srYG9NbC3BvbWYPOQlp1n2Hrwbt5kDk9a2G7Au8zzNj53fsK8ge0d+OS97Q62fXbZ+5n5+D6vz/r9S4Dst52Jp02fMzRvDeytgb01sLcG9tbA3hrYWwN7a7C17DzD0wb21sDeGthbA3trYG8N7K2BvTXYPKRl5xm2HrybN5nDkxa2G/Au87yNz52fMG9gewc+eW+7g22fXfZ+Zj6+z+uzfv8SIPttZ+Jp0+cMzVsDe2tgbw3srYG9NbC3BvbWwN4abC07z/C0gb01sLcG9tbA3hrYWwN7a2BvDTYPadl5hq0H7+ZN5vCkhe0GvMs8b+Nz5yfMG9jegU/e2+5g22eXvZ+Zj+/z+qzfvwTIftuZeNr0OUPz1sDeGthbA3trYG8N7K2BvTWwtwZby84zPG1gbw3srYG9NbC3BvbWwN4a2FuDzUNadp5h68G7eZM5PGlhuwHvMs/b+Nz5CfMGtnfgk/e2O9j22WXvZ+bj+7w+6/cvAbLfdiaeNn3O0Lw1sLcG9tbA3hrYWwN7a2BvDeytwday8wxPG9hbA3trYG8N7K2BvTWwtwb21mDzkJadZ9h68G7eZA5PWthuwLvM8zY+d37CvIHtHfjkve0Otn122fuZ+fg+r8/6/UuA7LediadNnzM0bw3srYG9NbC3BvbWwN4a2FsDe2uwtew8w9MG9tbA3hrYWwN7a2BvDeytgb012DykZecZth68mzeZw5MWthvwLvO8jc+dnzBvYHsHPnlvu4Ntn132fmY+vs/rs37/EiD7bWfiadPnDM1bA3trYG8N7K2BvTWwtwb21sDeGmwtO8/wtIG9NbC3BvbWwN4a2FsDe2tgbw02D2nZeYatB+/mTebwpIXtBrzLPG/jc+cnzBvY3oFP3tvuYNtnl72fmY/v8/qs378EyH7bmXja9DlD89bA3hrYWwN7a2BvDeytgb01sLcGW8vOMzxtYG8N7K2BvTWwtwb21sDeGthbg81DWnaeYevBu3mTOTxpYbsB7zLP2/jc+QnzBrZ34JP3tjvY9tll72fm4/u8Puv3LwGy33YmnjZ9ztC8NbC3BvbWwN4a2FsDe2tgbw3srcHWsvMMTxvYWwN7a2BvDeytgb01sLcG9tZg85CWnWfYevBu3mQOT1rYbsC7zPM2Pnd+wryB7R345L3tDrZ9dtn7mfn4Pq/P+v1LgOy3nYmnTZ8zNG8N7K2BvTWwtwb21sDeGthbA3trsLXsPMPTBvbWwN4a2FsDe2tgbw3srYG9Ndg8pGXnGbYevJs3mcOTFrYb8C7zvI3PnZ8wb2B7Bz55b7uDbZ9d9n5mPr7P67N+/xIg+21n4mnT5wzNWwN7a2BvDeytgb01sLcG9tbA3hpsLTvP8LSBvTWwtwb21sDeGthbA3trYG8NNg9p2XmGrQfv5k3m8KSF7Qa8yzxv43PnJ8wb2N6BT97b7mDbZ5e9n5mP7/P6rN+/BMh+25l42vQ5Q/PWwN4a2FsDe2tgbw3srYG9NbC3BlvLzjM8bWBvDeytgb01sLcG9tbA3hrYW4PNQ1p2nmHrwbt5kzk8aWG7Ae8yz9v43PkJ8wa2d+CT97Y72PbZZe9n5uP7vD7r9y8Bst92Jp42fc7QvDWwtwb21sDeGthbA3trYG8N7K3B1rLzDE8b2FsDe2tgbw3srYG9NbC3BvbWYPOQlp1n2Hrwbt5kDk9a2G7Au8zzNj53fsK8ge0d+OS97Q62fXbZ+5n5+D6vz/r9S4Dst52Jp02fMzRvDeytgb01sLcG9tbA3hrYWwN7a7C17DzD0wb21sDeGthbA3trYG8N7K2BvTXYPKRl5xm2HrybN5nDkxa2G/Au87yNz52fMG9gewc+eW+7g22fXfZ+Zj6+z+uzfv8SIPttZ+Jp0+cMzVsDe2tgbw3srYG9NbC3BvbWwN4abC07z/C0gb01sLcG9tbA3hrYWwN7a2BvDTYPadl5hq0H7+ZN5vCkhe0GvMs8b+Nz5yfMG9jegU/e2+5g22eXvZ+Zj+/z+qzfvwTIftuZeNr0OUPz1sDeGthbA3trYG8N7K2BvTWwtwZby84zPG1gbw3srYG9NbC3BvbWwN4a2FuDzUNadp5h68G7eZM5PGlhuwHvMs/b+Nz5CfMGtnfgk/e2O9j22WXvZ+bj+7w+6/cvAbLfdiaeNn3O0Lw1sLcG9tbA3hrYWwN7a2BvDeytwday8wxPG9hbA3trYG8N7K2BvTWwtwb21mDzkJadZ9h68G7eZA5PWthuwLvM8zY+d37CvIHtHfjkve0Otn122fuZ+fg+r8/6/UuA7LediadNnzM0bw3srYG9NbC3BvbWwN4a2FsDe2uwtew8w9MG9tbA3hrYWwN7a2BvDeytgb012DykZecZth68mzeZw5MWthvwLvO8jc+dnzBvYHsHPnlvu4Ntn132fmY+vs/rs37/EiD7bWfiadPnDM1bA3trYG8N7K2BvTWwtwb21sDeGmwtO8/wtIG9NbC3BvbWwN4a2FsDe2tgbw02D2nZeYatB+/mTebwpIXtBrzLPG/jc+cnzBvY3oFP3tvuYNtnl72fmY/v8/qs378EyH7bmXja9DlD89bA3hrYWwN7a2BvDeytgb01sLcGW8vOMzxtYG8N7K2BvTWwtwb21sDeGthbg81DWnaeYevBu3mTOTxpYbsB7zLP2/jc+QnzBrZ34JP3tjvY9tll72fm4/u8Puv3LwGy33YmnjZ9ztC8NbC3BvbWwN4a2FsDe2tgbw3srcHWsvMMTxvYWwN7a2BvDeytgb01sLcG9tZg85CWnWfYevBu3mQOT1rYbsC7zPM2Pnd+wryB7R345L3tDrZ9dtn7mfn4Pq/P+v1LgOy3nYmnTZ8zNG8N7K2BvTWwtwb21sDeGthbA3trsLXsPMPTBvbWwN4a2FsDe2tgbw3srYG9Ndg8pGXnGbYevJs3mcOTFrYb8C7zvI3PnZ8wb2B7Bz55b7uDbZ9d9n5mPr7P67N+/xIg+21n4mnT5wzNWwN7a2BvDeytgb01sLcG9tbA3hpsLTvP8LSBvTWwtwb21sDeGthbA3trYG8NNg9p2XmGrQfv5k3m8KSF7Qa8yzxv43PnJ8wb2N6BT97b7mDbZ5e9n5mP7/P6rN+/BMh+25l42vQ5Q/PWwN4a2FsDe2tgbw3srYG9NbC3BlvLzjM8bWBvDeytgb01sLcG9tbA3hrYW4PNQ1p2nmHrwbt5kzk8aWG7Ae8yz9v43PkJ8wa2d+CT97Y72PbZZe9n5uP7vD7r9y8Bst92Jp42fc7QvDWwtwb21sDeGthbA3trYG8N7K3B1rLzDE8b2FsDe2tgbw3srYG9NbC3BvbWYPOQlp1n2Hrwbt5kDk9a2G7Au8zzNj53fsK8ge0d+OS97Q62fXbZ+5n5+D6vz/r9S4Dst52Jp02fMzRvDeytgb01sLcG9tbA3hrYWwN7a7C17DzD0wb21sDeGthbA3trYG8N7K2BvTXYPKRl5xm2HrybN5nDkxa2G/Au87yNz52fMG9gewc+eW+7g22fXfZ+Zj6+z+uzfv8SIPttZ+Jp0+cMzVsDe2tgbw3srYG9NbC3BvbWwN4abC07z/C0gb01sLcG9tbA3hrYWwN7a2BvDTYPadl5hq0H7+ZN5vCkhe0GvMs8b+Nz5yfMG9jegU/e2+5g22eXvZ+Zj+/z+qzfvwTIftuZeNr0OUPz1sDeGthbA3trYG8N7K2BvTWwtwZby84zPG1gbw3srYG9NbC3BvbWwN4a2FuDzUNadp5h68G7eZM5PGlhuwHvMs/b+Nz5CfMGtnfgk/e2O9j22WXvZ+bj+9wnfRzHcfwU98N0HMdx/BT3w3Qcx3H8FPfDdBzHcfwU98N0HMdx/BT3w3Qcx3H8FPfDdBzHcfwU98N0HMdx/BT3w3Qcx3H8FPfDdBzHcfwU98N0HMdx/BT3w3Qcx3H8FPfDdBzHcfwU98N0HMdx/BT3w3Qcx3H8FPfDdBzHcfwU98N0HMdx/BT3w3Qcx3H8FPfDdBzHcfwU98N0HMdx/BT3w3Qcx3H8FPfDdBzHcfwU98N0HMdx/BT3w3T8Jf7v/+4/meM4vsv9LfM3w1/0/ufX+Sf/MP0n/rf7u8w/x3H8Ne7/av5G/ol/af2T/6L9T/xvn/8O/J/8mR3H38H9X8zfyD/xL6x/8l+y/4n/7du/436YjuOvcf8X8zfyV/7C4tb/bLSeXbt5wl/5c3yz3WXXbsD9j24a833/M/mz/mf80Z+50f497Z3j+G/n/iv/m2l/OYUnfxnNm83/7OYJT/+c7ebpzjx55yl/9t6/49/19M/Y7sz23rY7jv9G7r/yH+GP/tL59C+i+d6/689+8uf80Z/75M67p3/OU9p7/65/F/f+5ynb7dz9lT/vOP7J3H/pP8anfxlxN/8x02Hb/RlP/hz8j/4x0yfzXf/zCe29P2p/9d/19J67+c/Euz+6OY7/Ru6/9B9j/uXz5C+j7ebJn/Pkz558+u/a+LO7T/73Ndqf90ftr/5veHK/3fzZv/+v/u84jn8y91/7jzH/AsL/7C+lJ+9sf8af/bkbT/4c/Mmf/Wc3T/+cp7Q/b2uf/LufvLP9e/7oveyf/LnH8d/C/df+N5K/kPzPH/Fnd7PNmz9656/yV/4c9vMfM/2PmH/G0/c22p/T2lOevjf/PX/0nm+O43+F+y/+OH6Y+2E6/he5/+KP44e5H6Xjf5H7r/44foz8f0n3o3T8r3L/5R/HcRw/xf0wHcdxHD/F/TAdx3EcP8X9MB3HcRw/xf0wHcdxHD/F/TAdx3EcP8X9MB3HcRw/xf0wHcdxHD/F/TAdx3EcP8X9MB3HcRw/xf0wHcdxHD/F/TAdx3EcP8X9MB3HcRw/xf0wHcdxHD/F/TAdx3EcP8X9MB3HcRw/xf0wHcdxHD/F/TAdx3EcP8X9MB3HcRw/xf0wHcdxHD/F/TAdx3EcP8X9MB3HcRw/xf0wHcdxHD/F/TAdx3EcP8X9MB3HcRw/xf0wHcdxHD/F/TAdx3EcP8X9MB3HcRw/xf0wHcdxHD/F/TAdx3EcP8X9MB3HcRw/xf0wHcdxHD/F/TAdx3EcP8X9MB3HcRw/xf0wHcdxHD/F/TAdx3EcP8X9MB3HcRw/xf0wHcdxHD/F/TAdx3EcP8X9MB3HcRw/xf0wHcdxHD/F/TAdx3EcP8X9MB3HcRw/xf0wHcdxHD/F/TAdx3EcP8X9MB3HcRw/xf0wHcdxHD/F/TAdx3EcP8X9MB3HcRw/xf0wHcdxHD/F/TAdx3EcP8X9MB3HcRw/xf0wHcdxHD/Ev/71/72evwwsOZzxAAAAAElFTkSuQmCC">                <div><span>Viitenumero 2018 INVOICE11/07/2022367INOVITEN000001 000045 </span> </div>
-
-
     </div>
+    *@
+
+    <div style="text-align:center;margin-top:50px;">
+    @{
+        string barcode_format = Model.GetDictionaryItem("DisplayAddBarCode128");
+        string barcode_text = Model.GetDictionaryItem("BarCode128Text");
+        string barcode_text_location = Model.GetDictionaryItem("BarCode128TextLocation");
+        if (barcode_format.Contains("@account_number"))
+        {
+            string str_bank_account_number = "";
+            Model.DocumentConfig.InvoiceAccountNumber = Model.DocumentConfig.InvoiceAccountNumber ?? "";
+            for (int i = 0; i < Model.DocumentConfig.InvoiceAccountNumber.Length; i++)
+            {
+                if (Char.IsDigit(Model.DocumentConfig.InvoiceAccountNumber[i]))
+                {
+                    str_bank_account_number += Model.DocumentConfig.InvoiceAccountNumber[i];
+                }
+            }
+            if (str_bank_account_number.Length > 16)
+            {
+                str_bank_account_number = str_bank_account_number.Substring(0, 16);
+            }
+            else if (str_bank_account_number.Length < 16)
+            {
+                str_bank_account_number = str_bank_account_number.PadLeft(16, '0');
+            }
+            barcode_format = barcode_format.Replace("@account_number", str_bank_account_number);
+        }
+        //euros - 6
+        if (barcode_format.Contains("@invoice_total_euros"))
+        {
+            string strTotalValue = TotalValue.ToString("N", new System.Globalization.CultureInfo("en-US"));
+            strTotalValue = strTotalValue.Replace(",", "");
+            if (strTotalValue.Contains("."))
+            {
+                strTotalValue = strTotalValue.Substring(0, strTotalValue.IndexOf("."));
+            }
+            strTotalValue = strTotalValue.PadLeft(6, '0');
+            barcode_format = barcode_format.Replace("@invoice_total_euros", strTotalValue);
+        }
+        //cents - 2
+        if (barcode_format.Contains("@invoice_total_cents"))
+        {
+            string strTotalCentsValue = TotalValue.ToString("N", new System.Globalization.CultureInfo("en-US"));
+            strTotalCentsValue = strTotalCentsValue.Replace(",", "");
+            if (strTotalCentsValue.Contains("."))
+            {
+                strTotalCentsValue = strTotalCentsValue.Split('.')[1];
+            }
+            strTotalCentsValue = strTotalCentsValue.PadLeft(2, '0');
+            barcode_format = barcode_format.Replace("@invoice_total_cents", strTotalCentsValue);
+        }
+        //reference - 23
+
+        string strReferenceFormat = "";
+        int iReferenceMacrosCount = 0;
+        string[] strReferenceArrays = barcode_format.Split('@');
+        for (int i = 0; i < strReferenceArrays.Length; i++)
+        {
+            if (strReferenceArrays[i].ToLower().StartsWith("reference"))
+            {
+                strReferenceFormat = strReferenceFormat + "@" + strReferenceArrays[i];
+                iReferenceMacrosCount++;
+            }
+            //   if (i == strReferenceArrays.Length - 1 && isContainsReference == true)
+            //  {
+            //      strReferenceFormat = strReferenceFormat + "@reference_str";
+            //  }
+        }
+        if (strReferenceFormat.Contains("@reference_year"))
+        {
+            strReferenceFormat = strReferenceFormat.Replace("@reference_year", DateTime.Now.Year.ToString());
+        }
+        if (strReferenceFormat.Contains("@reference_tenant_id"))
+        {
+            string strCleanTenantId = System.Text.RegularExpressions.Regex.Replace(Model.TenantId.ToString(), "[^0-9]", "");
+            int value = 0;
+
+            // Tries to parse the int, returns false on failure.
+            if (int.TryParse(strCleanTenantId.Trim(), out value))
+            {
+                strReferenceFormat = strReferenceFormat.Replace("@reference_tenant_id", value.ToString());
+            }
+        }
+
+        if (strReferenceFormat.Contains("@reference_invoice_number"))
+        {
+            string strCleanInvoiceId = System.Text.RegularExpressions.Regex.Replace(Model.InvoiceNumber, "[^0-9]", "");
+            int iCleanInvoiceId = 0;
+            int.TryParse(strCleanInvoiceId.Trim(), out iCleanInvoiceId);
+            // Tries to parse the int, returns false on failure.
+
+            strReferenceFormat = strReferenceFormat.Replace("@reference_invoice_number", iCleanInvoiceId.ToString());
+
+        }
+        double strReferenceFormatNumber = 0;
+
+        double.TryParse(strReferenceFormat, out strReferenceFormatNumber);
+        /*
+            // calculate reference checksum
+            // https://www.finanssiala.fi/wp-content/uploads/2021/03/Forming_a_Finnish_reference_number.pdf
+                1. All digits of the reference number are multiplied from right to left with the values 7, 3, 1,7, 3, 1….
+                2. The products are then summed up and the sum is subtracted from the following full ten.
+                3. The resulting difference is the checksum, the final digit in the reference number.
+                4. If the difference is 10, the checksum is 0.
+            */
+        double ref_product_sum = 0;
+        int ref_stem = 1;
+        double tmp = 0;
+        for (int i = strReferenceFormatNumber.ToString().Length - 1; i >= 0; i--)
+        {
+            if (ref_stem > 3)
+            {
+                ref_stem = 1;
+            }
+            if (ref_stem == 1)
+            {
+                tmp = 0;
+                double.TryParse(strReferenceFormatNumber.ToString()[i].ToString(), out tmp);
+                ref_product_sum += tmp * 7;
+            }
+            else if (ref_stem == 2)
+            {
+                tmp = 0;
+                double.TryParse(strReferenceFormatNumber.ToString()[i].ToString(), out tmp);
+                ref_product_sum += tmp * 3;
+            }
+            else if (ref_stem == 3)
+            {
+                tmp = 0;
+                double.TryParse(strReferenceFormatNumber.ToString()[i].ToString(), out tmp);
+                ref_product_sum += tmp * 1;
+            }
+            ref_stem++;
+        }
+        double ref_reminder = ref_product_sum % 10;
+        double ref_product_sum_div = ref_product_sum;
+        if (ref_reminder < 5)
+        {
+            ref_product_sum_div = ref_product_sum_div + 5;
+        }
+        double ref_product_sum_ten = Math.Round(ref_product_sum_div / 10, 0, MidpointRounding.AwayFromZero) * 10;
+        ref_product_sum = ref_product_sum_ten - ref_product_sum;
+        if (ref_product_sum == 10)
+        {
+            ref_product_sum = 0;
+        }
+        strReferenceFormat = strReferenceFormat + ref_product_sum.ToString();
+        strReferenceFormat = strReferenceFormat.PadLeft(20, '0');
+        int iReferenceMacrosCount2 = 0;
+        for (int i = 0; i < strReferenceArrays.Length; i++)
+        {
+            if (strReferenceArrays[i].ToLower().StartsWith("reference"))
+            {
+                // strReferenceFormat = strReferenceFormat + "@" + strReferenceArrays[i];
+                iReferenceMacrosCount2++;
+                if (iReferenceMacrosCount2 == iReferenceMacrosCount)
+                {
+                    barcode_format = barcode_format.Replace("@" + strReferenceArrays[i], "@reference_str");
+                }
+                else
+                {
+                    barcode_format = barcode_format.Replace("@" + strReferenceArrays[i], "");
+                }
+            }
+        }
+
+        //reserve - 000
+        barcode_format = barcode_format.Replace("@reference_str", "000" + strReferenceFormat);
+
+        if (barcode_text.Contains("@reference_str"))
+        {
+            barcode_text = barcode_text.Replace("@reference_str", strReferenceFormatNumber.ToString());
+        }
+
+
+        if (barcode_format.Contains("@due_date"))
+        {
+            //if (invoiceDueDate != "" && invoiceDueDate != "-") //TODO is the below right replacement
+            if (Model.PaymentDueDateStr != "" && Model.PaymentDueDateStr != "-")
+            {
+                barcode_format = barcode_format.Replace("@due_date", (Convert.ToDateTime(Model.PaymentDueDateStr)).ToString("yyMMdd"));
+            }
+            else
+            {
+                barcode_format = barcode_format.Replace("@due_date", "");
+            }
+        }
+
+        Zen.Barcode.Code128BarcodeDraw barcode = Zen.Barcode.BarcodeDrawFactory.Code128WithChecksum;
+        var barcodeImage = barcode.Draw(barcode_format, 90);
+
+
+        var resultImage = new System.Drawing.Bitmap(barcodeImage.Width + 90, barcodeImage.Height + 90); // 20 is bottom padding, adjust to your text
+
+        var graphics = System.Drawing.Graphics.FromImage(resultImage);
+        var font = new System.Drawing.Font("Consolas", 12);
+        var brush = new System.Drawing.SolidBrush(System.Drawing.Color.Black);
+        var format = new System.Drawing.StringFormat();
+        format.Alignment = System.Drawing.StringAlignment.Center;
+        format.LineAlignment = System.Drawing.StringAlignment.Far;
+        graphics.Clear(System.Drawing.Color.White);
+        graphics.DrawImage(barcodeImage, 0, 0);
+        if (barcode_text_location.ToLower() == "top")
+        {
+            graphics.DrawString(barcode_text, font, brush, barcodeImage.Width / 2, 0, format);
+
+        }
+        else if (barcode_text_location.ToLower() == "left")
+        {
+            graphics.DrawString(barcode_text, font, brush, 0, barcodeImage.Height / 2, format);
+        }
+        else if (barcode_text_location.ToLower() == "right")
+        {
+            graphics.DrawString(barcode_text, font, brush, barcodeImage.Width + 40, barcodeImage.Height / 2, format);
+        }
+        else
+        {
+            //draw at bottom
+            graphics.DrawString(barcode_text, font, brush, barcodeImage.Width / 2, barcodeImage.Height + 40, format);
+        }
+
+        // resultImage.Save("temp");
+        MemoryStream ms = new MemoryStream();
+
+        resultImage.Save(ms, System.Drawing.Imaging.ImageFormat.Png);
+        byte[] barcode_image_bytes = ms.ToArray();
+        string barcode_image_base64 = Convert.ToBase64String(barcode_image_bytes);
+                            @Html.Raw("<img id=\"barcode\" class=\"barcode\" src=\"data:image/png;base64," + barcode_image_base64 + "\" />");
+
+                            <div><span>Viitenumero @(Model.InvoiceDate.Year + " " + Model.InvoiceNumber + " " + (Model.TenantId ?? "").Replace("TEN" , "")) </span> </div>
+        ms.Close();
+        Array.Clear(barcode_image_bytes, 0, barcode_image_bytes.Length);
+        /*  if (barcode_format.Contains("@check_digit"))
+            {
+                barcode_format = barcode_format.Replace("@check_digit","^^");
+                const int C_Code = 105;
+                int d, a = 1, sum = 0, product;
+                int checkSum = 0, checkDigit, x;
+                for (int i = 0; i <= (barcode_format.Length) - 2; i = i + 2)
+                {
+                    d = Convert.ToInt32(barcode_format.Substring(i, 2));
+                    product = a * d;
+                    sum += product;
+                    a++;
+                }
+                sum += C_Code;
+                checkSum = sum / 103;
+                x = checkSum * 103;
+                checkDigit = sum - x;
+                barcode_format = barcode_format.Replace("@check_digit", ((DateTime)Model.EstimatedTerminationDate).ToString("yyMMdd"));
+            }*/
+        }
+    </div>
+    }
 
     <div id="footer" style="display:none">
         <table>
@@ -783,14 +1437,11 @@
                     </td>
                 </tr>
                 <tr hidden="">
-
                     <td colspan="5" class="alignRight">
-
-
                         <input type="button" id="btnPDFExportReportSearch" value="Export PDF" class="btn  btn-success" style="display:none" tabindex="9" onclick="ExportInvoiceHtmlToPDF()">
                     </td>
                 </tr>
             </tbody>
         </table>
     </div>
-</div>
+ </div>
